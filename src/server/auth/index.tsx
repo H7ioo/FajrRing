@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { sendOTP } from "@/lib/sms";
 import { db } from "@/server/db";
 import { betterAuth as betterAuthClient } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -28,8 +29,12 @@ export const betterAuth = betterAuthClient({
   },
   plugins: [
     phoneNumber({
-      async sendOTP(data, request) {
-        // TODO: Implement sending OTP code
+      async sendOTP({ phoneNumber, code }, request) {
+        await sendOTP({ phoneNumber, code });
+      },
+
+      async sendForgetPasswordOTP({ phoneNumber, code }, request) {
+        await sendOTP({ phoneNumber, code });
       },
 
       // To allow sign up with phone  number
