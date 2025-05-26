@@ -1,7 +1,11 @@
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import {
+  inferAdditionalFields,
+  phoneNumberClient,
+} from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 export const authClient = createAuthClient({
   plugins: [
+    phoneNumberClient(),
     // ! Not working correctly
     // inferAdditionalFields<typeof auth>(),
     inferAdditionalFields({

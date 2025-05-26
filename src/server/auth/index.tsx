@@ -3,6 +3,7 @@ import { db } from "@/server/db";
 import { betterAuth as betterAuthClient } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { phoneNumber } from "better-auth/plugins/phone-number";
 import { headers } from "next/headers";
 import { cache } from "react";
 
@@ -25,7 +26,21 @@ export const betterAuth = betterAuthClient({
     expiresIn: 60 * 60 * 24 * 14, // 14 days
     updateAge: 60 * 60 * 24, // 1 day (every 1 day the session expiration is updated)
   },
-  plugins: [nextCookies()], // make sure nextCookies is the last plugin in the array
+  plugins: [
+    phoneNumber({
+      async sendOTP(data, request) {
+        // TODO: Implement sending OTP code
+      },
+
+      // To allow sign up with phone  number
+      signUpOnVerification: {
+        getTempEmail(phoneNumber) {
+          return `${phoneNumber}@my-site.com`; // TODO: Change the site name
+        },
+      },
+    }),
+    nextCookies(),
+  ], // make sure nextCookies is the last plugin in the array
 });
 
 export const { handler } = betterAuth;

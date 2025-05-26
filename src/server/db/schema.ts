@@ -39,6 +39,10 @@ export const user = createTable("user", (t) => ({
   updatedAt: t
     .timestamp("updated_at", { withTimezone: true })
     .$onUpdate(() => new Date()),
+
+  // Phone number plugin
+  phoneNumber: t.text("phone_number").unique(),
+  phoneNumberVerified: t.boolean("phone_number_verified"),
 }));
 
 export const userRelations = relations(user, ({ one, many }) => ({
