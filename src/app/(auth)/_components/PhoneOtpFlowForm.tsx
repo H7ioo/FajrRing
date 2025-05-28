@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { PhoneInput } from "@/components/phone-input";
@@ -93,39 +93,54 @@ const PhoneOtpFlowForm: React.FC<PhoneOtpFlowFormProps> = ({ flowType }) => {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    if (isOtpSent) {
+      // Use a small timeout to ensure the DOM has fully rendered
+      // and the InputOTP component is ready for focus.
+      // This is often necessary with conditional rendering or animations.
+      const timer = setTimeout(() => {
+        verifyOtpForm.setFocus("otp");
+      }, 50);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOtpSent, verifyOtpForm]);
+
+  // ! field.value is becoming true after conditionally rendering it. So now initially the form exists but it is hidden.
   return (
     <div className="space-y-6">
-      {!isOtpSent ? (
-        <Form {...sendOtpForm}>
-          <form
-            onSubmit={sendOtpForm.handleSubmit(handleSendOtpSubmit)}
-            className="space-y-6"
-          >
+      <Form {...sendOtpForm}>
+        <form
+          onSubmit={sendOtpForm.handleSubmit(handleSendOtpSubmit)}
+          className="space-y-6"
+          style={{ display: isOtpSent ? "none" : "block" }}
+        >
+          <FormField
+            control={sendOtpForm.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
+                <FormControl>
+                  <PhoneInput
+                    placeholder="+90 555 123 45 67"
+                    international
+                    defaultCountry="TR"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {flowType === "signup" && (
             <FormField
               control={sendOtpForm.control}
-              name="phoneNumber"
+              name="privacyAccepted"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <PhoneInput
-                      placeholder="+90 555 123 45 67"
-                      international
-                      defaultCountry="TR"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {flowType === "signup" && (
-              <FormField
-                control={sendOtpForm.control}
-                name="privacyAccepted"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center rounded-md border p-4 shadow-sm">
+                  <div className="flex flex-row items-center space-x-2 rounded-md border p-4 shadow-sm">
                     <FormControl>
                       <Checkbox
                         checked={field.value as boolean | undefined}
@@ -147,31 +162,33 @@ const PhoneOtpFlowForm: React.FC<PhoneOtpFlowFormProps> = ({ flowType }) => {
                         Privacy Policy
                       </Link>
                     </FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send Verification Code"}
-            </Button>
-          </form>
-        </Form>
-      ) : (
-        <Form {...verifyOtpForm}>
-          <form
-            onSubmit={verifyOtpForm.handleSubmit(handleVerifyOtpSubmit)}
-            className="space-y-6"
-          >
-            <p className="text-muted-foreground text-sm">
-              Enter the 6-digit code sent to {currentPhoneNumber}.
-            </p>
-            <FormField
-              control={verifyOtpForm.control}
-              name="otp"
-              render={({ field }) => (
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+          <Button type="submit" className="w-full" loading={isLoading}>
+            Send Verification Code
+          </Button>
+        </form>
+      </Form>
+
+      <Form {...verifyOtpForm}>
+        <form
+          onSubmit={verifyOtpForm.handleSubmit(handleVerifyOtpSubmit)}
+          className="space-y-6"
+          style={{ display: isOtpSent ? "block" : "none" }}
+        >
+          <p className="text-muted-foreground text-sm">
+            Enter the 6-digit code sent to {currentPhoneNumber}.
+          </p>
+          <FormField
+            control={verifyOtpForm.control}
+            name="otp"
+            render={({ field }) => {
+              return (
                 <FormItem>
-                  {/* TODO: Center or take all width or add separator */}
                   <FormLabel>Verification Code</FormLabel>
                   <FormControl>
                     <InputOTP
@@ -192,45 +209,40 @@ const PhoneOtpFlowForm: React.FC<PhoneOtpFlowFormProps> = ({ flowType }) => {
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading
-                ? "Verifying..."
-                : flowType === "signin"
-                  ? "Verify & Sign In"
-                  : "Verify & Create Account"}
+              );
+            }}
+          />
+          <Button type="submit" className="w-full" loading={isLoading}>
+            {flowType === "signin"
+              ? "Verify & Sign In"
+              : "Verify & Create Account"}
+          </Button>
+          <div className="flex justify-between text-sm">
+            <Button
+              type="button"
+              variant="link"
+              onClick={() =>
+                handleSendOtpSubmit({ phoneNumber: currentPhoneNumber })
+              }
+              className="text-primary px-0"
+              loading={isLoading}
+            >
+              Resend Code
             </Button>
-            <div className="flex justify-between text-sm">
-              <Button
-                type="button"
-                variant="link"
-                onClick={() =>
-                  handleSendOtpSubmit({
-                    phoneNumber: currentPhoneNumber,
-                  } as CurrentSendOtpFormValues)
-                }
-                className="text-primary px-0"
-                disabled={isLoading}
-              >
-                Resend Code
-              </Button>
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => {
-                  setIsOtpSent(false);
-                  verifyOtpForm.reset();
-                }}
-                className="px-0"
-                disabled={isLoading}
-              >
-                Change Phone Number
-              </Button>
-            </div>
-          </form>
-        </Form>
-      )}
+            <Button
+              type="button"
+              variant="link"
+              onClick={() => {
+                setIsOtpSent(false);
+              }}
+              className="px-0"
+              loading={isLoading}
+            >
+              Change Phone Number
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 };
