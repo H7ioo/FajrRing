@@ -134,7 +134,7 @@ export function useAuth() {
   const loginWithOAuth = async (provider: AuthProvider) => {
     await signIn.social({
       provider,
-      callbackURL: "/dashboard", // Ensure this matches your Better Auth OAuth config
+      callbackURL: "/dashboard",
       fetchOptions: {
         onError: createErrorHandler({
           title: "OAuth Login Failed. Please try again.",
@@ -148,7 +148,7 @@ export function useAuth() {
       fetchOptions: {
         onSuccess: createSuccessHandler({
           title: "Logged out successfully.",
-          route: "/login", //
+          route: "/login",
         }),
         onError: createErrorHandler({
           title: "Logout Failed. Please try again.",
