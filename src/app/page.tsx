@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/server/auth";
 import { ArrowRight, Bell, Clock, Settings } from "lucide-react";
 import Link from "next/link";
 import { FeatureCard } from "./_components/feature-card";
@@ -32,7 +33,26 @@ const features = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+  const user = session?.user;
+
+  const isLoggedIn = !!user;
+
+  const primaryCta = isLoggedIn
+    ? { href: "/dashboard", label: "Go to Dashboard" }
+    : {
+        href: { pathname: "/login", query: { tab: "signup" } },
+        label: "Get Started Free",
+      };
+
+  const ctaSectionCta = isLoggedIn
+    ? { href: "/dashboard", label: "Go to Dashboard" }
+    : {
+        href: { pathname: "/login", query: { tab: "signup" } },
+        label: "Create Free Account",
+      };
+
   return (
     <div className="from-background via-muted/10 to-secondary/5 flex min-h-screen flex-col bg-gradient-to-br">
       <Header />
@@ -53,8 +73,8 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="group">
-                <Link href={{ pathname: "/login", query: { tab: "signup" } }}>
-                  Get Started Free
+                <Link href={primaryCta.href}>
+                  {primaryCta.label}
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
@@ -102,19 +122,21 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="group">
-                <Link href={{ pathname: "/login", query: { tab: "signup" } }}>
-                  Create Free Account
+                <Link href={ctaSectionCta.href}>
+                  {ctaSectionCta.label}
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-primary text-primary hover:bg-primary/5 hover:text-primary"
-              >
-                <Link href="/faq">Learn More</Link>
-              </Button>
+              {!isLoggedIn && (
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="border-primary text-primary hover:bg-primary/5 hover:text-primary"
+                >
+                  <Link href="/faq">Learn More</Link>
+                </Button>
+              )}
             </div>
           </div>
         </section>
