@@ -53,7 +53,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="group">
-                <Link href="/auth/login">
+                <Link href={{ pathname: "/login", query: { tab: "signup" } }}>
                   Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
@@ -102,7 +102,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="group">
-                <Link href="/auth/login">
+                <Link href={{ pathname: "/login", query: { tab: "signup" } }}>
                   Create Free Account
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
