@@ -1,57 +1,126 @@
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Bell, Clock, Settings } from "lucide-react";
 import Link from "next/link";
+import { FeatureCard } from "./_components/feature-card";
 
-import { LatestPost } from "@/app/_components/post";
-import { auth } from "@/server/auth";
-import { api, HydrateClient } from "@/trpc/server";
+const features = [
+  {
+    icon: Bell,
+    title: "Automated Calls",
+    description:
+      "Receive reliable phone calls before Fajr prayer time, customized to wake you up gently.",
+    iconBgClass: undefined,
+    iconTextClass: "text-primary",
+  },
+  {
+    icon: Clock,
+    title: "Precise Timing",
+    description:
+      "Based on your exact location and preferred calculation method for accurate prayer times.",
+    iconBgClass: undefined,
+    iconTextClass: "text-secondary-foreground",
+  },
+  {
+    icon: Settings,
+    title: "Fully Customizable",
+    description:
+      "Adjust call timing, choose your calculation method, and manage your preferences easily.",
+    iconBgClass: undefined,
+    iconTextClass: "text-accent-foreground",
+  },
+];
 
-export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
-
-  void api.post.getLatest.prefetch();
-
-  const session = await auth();
-
+export default function HomePage() {
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-          </div>
+    <div className="from-background via-muted/10 to-secondary/5 flex min-h-screen flex-col bg-gradient-to-br">
+      <Header />
 
-          <LatestPost />
-          {JSON.stringify(session)}
-        </div>
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="relative py-20 lg:py-32">
+          {/* Optional: Add subtle background patterns or shapes here */}
+          <div className="container mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+            <h1 className="animate-fade-in text-foreground mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+              Your daily call to prayer,{" "}
+              <span className="text-primary">personalized</span>
+            </h1>
+            <p className="text-muted-foreground mx-auto mb-10 max-w-3xl text-lg sm:text-xl">
+              Wake up peacefully for Fajr prayer with automated phone calls
+              tailored to your location, prayer calculation method, and personal
+              preferences.
+            </p>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button asChild size="lg" className="group">
+                <Link href="/auth/login">
+                  Get Started Free
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-16 sm:py-20 lg:py-24">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-center md:mb-16">
+              <h2 className="text-foreground mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Simple. Reliable. Personal.
+              </h2>
+              <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+                Everything you need for a consistent Fajr prayer routine,
+                designed with care and precision.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+              {features.map((feature) => (
+                <FeatureCard
+                  key={feature.title}
+                  icon={feature.icon}
+                  title={feature.title}
+                  description={feature.description}
+                  iconBgClass={feature.iconBgClass}
+                  iconTextClass={feature.iconTextClass}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="bg-primary/5 py-16 sm:py-20 lg:py-24">
+          <div className="container mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+            <h2 className="text-foreground mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              Start your consistent Fajr routine today
+            </h2>
+            <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-lg">
+              Join thousands of Muslims who trust FajrRing for their daily
+              prayer calls.
+            </p>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button asChild size="lg" className="group">
+                <Link href="/auth/login">
+                  Create Free Account
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-primary text-primary hover:bg-primary/5 hover:text-primary"
+              >
+                <Link href="/faq">Learn More</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
       </main>
-    </HydrateClient>
+
+      <Footer />
+    </div>
   );
 }

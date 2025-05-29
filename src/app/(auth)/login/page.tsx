@@ -10,14 +10,18 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 
+import { useSearchParams } from "next/navigation";
 import LogoHeader from "../_components/LogoHeader";
 import PhoneOtpFlowForm from "../_components/PhoneOtpFlowForm";
 import SignInPasswordForm from "../_components/SignInPasswordForm";
 import SocialLogins from "../_components/SocialLogins";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
   const [activeMainTab, setActiveMainTab] = useState<"signin" | "signup">(
-    "signin",
+    // For type safety. Default is signin
+    tab === "signin" ? "signin" : tab === "signup" ? "signup" : "signin",
   );
 
   const [activeSignInMethodTab, setActiveSignInMethodTab] = useState<
