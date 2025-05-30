@@ -12,7 +12,9 @@ interface InfoPageHeaderProps {
 export function InfoHeader({ pageTitle }: InfoPageHeaderProps) {
   return (
     <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
-      <div className="container mx-auto flex h-14 items-center px-4 sm:px-6 lg:px-8">
+      {/* <div className="container mx-auto flex h-14 items-center px-4 sm:px-6 lg:px-8"> */}
+
+      <div className="mx-auto flex h-14 max-w-4xl items-center px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <Button
             asChild

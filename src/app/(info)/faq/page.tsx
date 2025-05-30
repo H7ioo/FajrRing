@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,6 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { HelpCircle, MessageSquare } from "lucide-react";
+import Link from "next/link";
 
 const faqs = [
   {
@@ -77,31 +80,96 @@ const faqs = [
 
 export default function FaqPage() {
   return (
-    <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-      <Card className="shadow-lg">
-        <CardHeader className="text-center sm:text-left">
-          <CardTitle className="text-foreground text-2xl font-bold sm:text-3xl">
-            Frequently Asked Questions
-          </CardTitle>
-          <CardDescription className="text-muted-foreground mt-1">
-            Find answers to common questions about FajrRing.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Accordion type="single" collapsible className="w-full">
-            {faqs.map((faq) => (
-              <AccordionItem key={faq.id} value={faq.id}>
-                <AccordionTrigger className="py-4 text-left text-base font-medium hover:no-underline sm:text-lg">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pt-0 pb-4 text-base">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      {/* <div className="grid grid-cols-1 gap-8 lg:grid-cols-3"> */}
+      <div className="grid grid-cols-1 gap-8">
+        {/* FAQ Content */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-2xl">
+                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                  <HelpCircle className="text-primary h-5 w-5" />
+                </div>
+                <span>Frequently Asked Questions</span>
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Find answers to common questions about FajrRing and how it
+                works.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Accordion type="single" collapsible className="w-full">
+                {faqs.map((faq) => (
+                  <AccordionItem key={faq.id} value={faq.id}>
+                    <AccordionTrigger className="py-4 text-left text-base font-medium hover:no-underline sm:text-lg">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pt-0 pb-4 text-base">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-xl">
+                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                  <MessageSquare className="text-primary h-5 w-5" />
+                </div>
+                <span>Still have questions?</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground text-sm">
+                Can&apos;t find what you&apos;re looking for? We&apos;re here to
+                help.
+              </p>
+              <Button asChild className="w-full">
+                <Link href="/contact">Contact Support</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* <Card className="bg-primary/5">
+              <CardContent className="p-6">
+                <h3 className="text-foreground mb-2 font-semibold">
+                  Quick Support
+                </h3>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  For immediate assistance, email us directly:
+                </p>
+                <a
+                  href="mailto:support@fajrring.com"
+                  className="text-primary text-sm font-medium hover:underline"
+                >
+                  support@fajrring.com
+                </a>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-foreground mb-2 font-semibold">
+                  Getting Started
+                </h3>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  New to FajrRing? Learn how to set up your account and
+                  customize your settings.
+                </p>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/dashboard">Go to Dashboard</Link>
+                </Button>
+              </CardContent>
+            </Card> */}
+        </div>
+      </div>
+    </>
   );
 }
