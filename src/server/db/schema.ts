@@ -2,7 +2,7 @@
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
 import { relations, sql } from "drizzle-orm";
-import { index, pgTableCreator } from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTableCreator } from "drizzle-orm/pg-core";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -48,6 +48,10 @@ export const user = createTable("user", (t) => ({
 export const userRelations = relations(user, ({ one, many }) => ({
   sessions: many(session),
   accounts: many(account),
+  preferences: one(preference, {
+    fields: [user.id],
+    references: [preference.userId],
+  }),
 }));
 
 export const session = createTable(
@@ -121,4 +125,86 @@ export const verification = createTable("verification", (t) => ({
   updatedAt: t
     .timestamp("updated_at", { withTimezone: true })
     .$onUpdate(() => new Date()),
+}));
+
+export const preference = createTable("preference", (t) => ({
+  id: t.uuid("id").primaryKey().defaultRandom(),
+  userId: t
+    .text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  latitude: t.doublePrecision("latitude"),
+  longitude: t.doublePrecision("longitude"),
+  timezone: t.text("timezone"),
+  prayerMethodId: t.text("prayer_method_id"),
+  fajrOffsetMinutes: t.integer("fajr_offset_minutes").default(0),
+  nextCallTimeUtc: t.timestamp("next_call_time", {
+    mode: "date",
+    withTimezone: true,
+  }),
+  isActive: t.boolean("is_active").notNull().default(true),
+  createdAt: t
+    .timestamp("created_at", { withTimezone: true, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: t
+    .timestamp("updated_at", { withTimezone: true, mode: "date" })
+    .$onUpdate(() => new Date()),
+}));
+
+export const preferenceRelations = relations(preference, ({ one }) => ({
+  user: one(user, {
+    fields: [preference.userId],
+    references: [user.id],
+  }),
+}));
+
+export const callStatusEnum = pgEnum("status", [
+  "PENDING",
+  "INITIATED",
+  "RINGING",
+  "ANSWERED",
+  "COMPLETED", // Successfully played message
+  "NO_ANSWER",
+  "BUSY",
+  "FAILED", // Twilio error or other failure
+  "RETRY_SCHEDULED",
+]);
+
+export const callLog = createTable("call_log", (t) => ({
+  id: t.uuid("id").primaryKey().defaultRandom(),
+  userId: t
+    .text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  scheduledTimeUtc: t
+    .timestamp("scheduled_time_utc", { mode: "date", withTimezone: true })
+    .notNull(),
+  initiatedTimeUtc: t.timestamp("initiated_time_utc", {
+    mode: "date",
+    withTimezone: true,
+  }),
+  twilioCallSid: t.text("twilio_call_sid").unique(),
+  status: callStatusEnum().default("PENDING").notNull(),
+  attemptNumber: t.integer("attempt_number").default(1).notNull(),
+  retryScheduledTimeUtc: t.timestamp("retry_scheduled_time_utc", {
+    mode: "date",
+    withTimezone: true,
+  }),
+  durationSeconds: t.integer("duration_seconds"),
+  errorMessage: t.text("error_message"),
+  createdAt: t
+    .timestamp("created_at", { mode: "date", withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: t
+    .timestamp("updated_at", { mode: "date", withTimezone: true })
+    .$onUpdate(() => new Date()),
+}));
+
+export const callLogRelations = relations(callLog, ({ one }) => ({
+  user: one(user, {
+    fields: [callLog.userId],
+    references: [user.id],
+  }),
 }));
