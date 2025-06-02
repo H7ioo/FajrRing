@@ -135,7 +135,7 @@ export const preference = createTable("preference", (t) => ({
     .references(() => user.id, { onDelete: "cascade" }),
   latitude: t.doublePrecision("latitude"),
   longitude: t.doublePrecision("longitude"),
-  timezone: t.text("timezone"),
+  timezone: t.text("timezone"), // Europe/Berlin
   prayerMethodId: t.text("prayer_method_id"),
   fajrOffsetMinutes: t.integer("fajr_offset_minutes").default(0),
   nextCallTimeUtc: t.timestamp("next_call_time", {

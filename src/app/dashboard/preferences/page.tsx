@@ -26,6 +26,12 @@ const preferencesSchema = z.object({
       country: z.string(),
       latitude: z.number(),
       longitude: z.number(),
+      timezone: z.object({
+        timeZoneId: z.string(),
+        timeZoneName: z.string(),
+        rawOffset: z.number(),
+        dstOffset: z.number(),
+      }),
     })
     .optional(),
   calculationMethod: PrayerCalculationMethodEnum,

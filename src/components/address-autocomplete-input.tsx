@@ -12,7 +12,7 @@ import { api } from "@/trpc/react";
 import { Loader2, MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
-
+import { v4 as uuidv4 } from "uuid";
 // TODO: re-write
 
 export interface LocationData {
@@ -23,6 +23,12 @@ export interface LocationData {
   country: string;
   latitude: number;
   longitude: number;
+  timezone: {
+    timeZoneId: string;
+    timeZoneName: string;
+    rawOffset: number;
+    dstOffset: number;
+  };
 }
 
 interface AddressAutocompleteInputProps {
@@ -47,6 +53,7 @@ export function AddressAutocompleteInput({
   const [processingLocation, setProcessingLocation] =
     useState<LocationData | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [sessionToken, setSessionToken] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,11 +69,12 @@ export function AddressAutocompleteInput({
     isLoading: isLoadingSuggestions,
     error: suggestionsError,
   } = api.geo.placesAutocomplete.useQuery(
-    { input: debouncedSearchText },
+    { input: debouncedSearchText, sessionToken },
     {
       enabled:
         !!debouncedSearchText &&
         debouncedSearchText.length >= 2 &&
+        !!sessionToken &&
         (!processingLocation ||
           (processingLocation.displayName !== debouncedSearchText &&
             processingLocation.latitude === 0)), // Allow search if current text differs from processing one AND details not yet fetched
@@ -79,10 +87,12 @@ export function AddressAutocompleteInput({
     isLoading: isLoadingDetails,
     error: detailsError,
   } = api.geo.placeDetails.useQuery(
-    { placeId: processingLocation?.placeId ?? "" },
+    { placeId: processingLocation?.placeId ?? "", sessionToken },
     {
       enabled:
-        !!processingLocation?.placeId && processingLocation.latitude === 0,
+        !!processingLocation?.placeId &&
+        !!sessionToken &&
+        processingLocation.latitude === 0,
     },
   );
 
@@ -115,9 +125,16 @@ export function AddressAutocompleteInput({
         country: placeDetails.country || "",
         latitude: placeDetails.latitude,
         longitude: placeDetails.longitude,
+        timezone: {
+          timeZoneId: placeDetails.timezone.timeZoneId,
+          timeZoneName: placeDetails.timezone.timeZoneName,
+          rawOffset: placeDetails.timezone.rawOffset,
+          dstOffset: placeDetails.timezone.dstOffset,
+        },
       };
       onLocationSelect(fullLocationData);
       setProcessingLocation(null); // Done processing
+      setSessionToken(""); // Clear session token - session is now terminated
       setOpen(false); // Close dropdown after successful detail fetch
     }
   }, [placeDetails, processingLocation, onLocationSelect]);
@@ -155,6 +172,12 @@ export function AddressAutocompleteInput({
       country: "",
       latitude: 0,
       longitude: 0,
+      timezone: {
+        timeZoneId: "",
+        timeZoneName: "",
+        rawOffset: 0,
+        dstOffset: 0,
+      },
     };
     setProcessingLocation(tempLocation);
     setOpen(false);
@@ -165,6 +188,17 @@ export function AddressAutocompleteInput({
   const handleInputChange = (newText: string) => {
     setCurrentSearchText(newText);
     setFocusedIndex(-1);
+
+    // Generate session token when user starts typing (first character)
+    if (newText.length === 1 && !sessionToken) {
+      setSessionToken(uuidv4());
+    }
+
+    // Clear session token if input is cleared
+    if (newText.length === 0) {
+      setSessionToken("");
+    }
+
     if (processingLocation) {
       setProcessingLocation(null); // User is typing again, cancel current processing
     }

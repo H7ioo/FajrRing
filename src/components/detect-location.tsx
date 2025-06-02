@@ -24,10 +24,10 @@ export function DetectLocation({
   const [isDetecting, setIsDetecting] = useState(false);
 
   // tRPC mutation to get address from coordinates
-  const getAddressMutation = api.geo.getAddress.useMutation({
+  const getAddressMutation = api.geo.getAddressWithTimezone.useMutation({
     onSuccess: (data) => {
-      if (data && data.length > 0) {
-        const result = data[0];
+      if (data && data.address.length > 0) {
+        const result = data.address[0];
         if (result) {
           // Extract city and country from address components
           let city = "";
@@ -57,6 +57,7 @@ export function DetectLocation({
             country,
             latitude: result.geometry?.location?.lat || 0,
             longitude: result.geometry?.location?.lng || 0,
+            timezone: data.timezone,
           };
 
           onLocationDetected(locationData);

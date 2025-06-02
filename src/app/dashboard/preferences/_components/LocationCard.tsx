@@ -6,8 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form";
-import { cn } from "@/lib/utils";
-import { api } from "@/trpc/react";
 import { MapPin } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { useWatch } from "react-hook-form";
@@ -21,42 +19,28 @@ import { useFormData } from "../page";
 export function LocationCard() {
   const { form, isLoading } = useFormData();
 
-  const watchedLocationData = useWatch({
+  const watchedTimezone = useWatch({
     control: form.control,
-    name: "locationData",
+    name: "locationData.timezone",
   });
-
-  // TODO: timezone should also be saved
-  const { data: timezone, isFetching: isFetchingTimezone } =
-    api.geo.getTimezone.useQuery(
-      {
-        lat: watchedLocationData?.latitude ?? 0,
-        lng: watchedLocationData?.longitude ?? 0,
-      },
-      {
-        enabled: !!(
-          watchedLocationData?.latitude && watchedLocationData?.longitude
-        ),
-        placeholderData: (data) => data,
-      },
-    );
 
   const timezoneInfo = useMemo(() => {
     if (
-      timezone?.rawOffset !== undefined &&
-      timezone?.dstOffset !== undefined &&
-      timezone?.timeZoneName
+      watchedTimezone?.rawOffset !== undefined &&
+      watchedTimezone?.dstOffset !== undefined &&
+      watchedTimezone?.timeZoneName
     ) {
-      const offset = (timezone.rawOffset + timezone.dstOffset) / 3600;
+      const offset =
+        (watchedTimezone.rawOffset + watchedTimezone.dstOffset) / 3600;
       const offsetString = offset >= 0 ? `+${offset}` : `${offset}`;
-      return `GMT${offsetString} (${timezone.timeZoneName})`;
+      return `GMT${offsetString} (${watchedTimezone.timeZoneName})`;
     } else {
       const now = new Date();
       const offset = -now.getTimezoneOffset() / 60;
       const offsetString = offset >= 0 ? `+${offset}` : `${offset}`;
       return `GMT${offsetString} (Local Time)`;
     }
-  }, [timezone?.rawOffset, timezone?.dstOffset, timezone?.timeZoneName]);
+  }, [watchedTimezone]);
 
   // TODO: We could do a re-write
   const handleLocationChange = useCallback(
@@ -150,10 +134,7 @@ export function LocationCard() {
         </div>
         <div className="bg-muted rounded-lg p-4">
           <p className="text-muted-foreground text-sm">
-            <strong>Timezone:</strong>{" "}
-            <span className={cn({ "opacity-0": isFetchingTimezone })}>
-              {timezoneInfo}
-            </span>
+            <strong>Timezone:</strong> <span>{timezoneInfo}</span>
           </p>
         </div>
       </CardContent>

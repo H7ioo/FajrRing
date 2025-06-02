@@ -59,18 +59,21 @@ export function FajrCallTimingCard() {
           <div>
             <CardTitle>Fajr Call Timing</CardTitle>
             <CardDescription>
-              When should we call you before Fajr prayer? (
-              <span
-                className={cn({
-                  "opacity-70": isFetchingPrayerTimings,
-                })}
-              >
-                {addMinutesToTimeString(
-                  prayerTimings?.timings.Fajr ?? "",
-                  form.watch("callOffset")[0]!,
-                )}
-              </span>
-              )
+              When should we call you before Fajr prayer?{" "}
+              {prayerTimings?.timings.Fajr && (
+                <span
+                  className={cn({
+                    "opacity-70": isFetchingPrayerTimings,
+                  })}
+                >
+                  (
+                  {addMinutesToTimeString(
+                    prayerTimings?.timings.Fajr ?? "",
+                    form.watch("callOffset")[0]!,
+                  )}
+                  )
+                </span>
+              )}
             </CardDescription>
           </div>
         </div>

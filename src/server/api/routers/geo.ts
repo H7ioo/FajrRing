@@ -1,14 +1,57 @@
 import { z } from "zod";
 
 import { env } from "@/env";
+import { tryCatch } from "@/lib/utils";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { Client, Status } from "@googlemaps/google-maps-services-js";
 import { PlacesClient } from "@googlemaps/places"; // Using the new Places API Client
+import { TRPCError } from "@trpc/server";
 
 const legacyGoogleMapsClient = new Client(); // For older methods if needed
 const placesClient = new PlacesClient({
   apiKey: env.GOOGLE_MAPS_SECRET,
 });
+
+const getTimezone = async ({ lat, lng }: { lat: number; lng: number }) => {
+  try {
+    const response = await legacyGoogleMapsClient.timezone({
+      params: {
+        key: env.GOOGLE_MAPS_SECRET,
+        location: { lat: lat, lng: lng },
+        timestamp: Math.floor(Date.now() / 1000),
+      },
+    });
+
+    if (response.data.status !== Status.OK) {
+      console.error("Timezone API error:", response.data.error_message);
+      throw new Error(`Failed to get timezone: ${response.data.status}`);
+    }
+
+    return {
+      timeZoneId: response.data.timeZoneId,
+      timeZoneName: response.data.timeZoneName,
+      rawOffset: response.data.rawOffset,
+      dstOffset: response.data.dstOffset,
+    };
+  } catch (error) {
+    console.error("Timezone processing error:", error);
+    throw new Error("Failed to fetch timezone information");
+  }
+};
+
+const getAddress = async ({ lat, lng }: { lat: number; lng: number }) => {
+  const response = await legacyGoogleMapsClient.reverseGeocode({
+    params: {
+      key: env.GOOGLE_MAPS_SECRET,
+      latlng: { lat, lng },
+    },
+  });
+  if (response.data.status !== Status.OK) {
+    console.error("Reverse geocode error:", response.data.error_message);
+    throw new Error(`Failed to get address: ${response.data.status}`);
+  }
+  return response.data.results;
+};
 
 export const geoRouter = createTRPCRouter({
   getCoordinates: protectedProcedure
@@ -30,55 +73,42 @@ export const geoRouter = createTRPCRouter({
 
   getAddress: protectedProcedure
     .input(z.object({ lat: z.number(), lng: z.number() }))
+    .mutation(({ input }) => getAddress(input)),
+
+  getAddressWithTimezone: protectedProcedure
+    .input(z.object({ lat: z.number(), lng: z.number() }))
     .mutation(async ({ input }) => {
       const { lat, lng } = input;
-      const response = await legacyGoogleMapsClient.reverseGeocode({
-        params: {
-          key: env.GOOGLE_MAPS_SECRET,
-          latlng: { lat, lng },
-        },
-      });
-      if (response.data.status !== Status.OK) {
-        console.error("Reverse geocode error:", response.data.error_message);
-        throw new Error(`Failed to get address: ${response.data.status}`);
-      }
-      return response.data.results;
+      // TODO: better error handling
+      const { data: address, error: addressError } = await tryCatch(
+        getAddress({ lat, lng }),
+      );
+      if (addressError)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Address not found",
+        });
+      const { data: timezone, error: timezoneError } = await tryCatch(
+        getTimezone({ lat, lng }),
+      );
+      if (timezoneError)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Timezone not found",
+        });
+
+      return { address, timezone };
     }),
 
   getTimezone: protectedProcedure
     .input(z.object({ lat: z.number(), lng: z.number() }))
-    .query(async ({ input }) => {
-      try {
-        const response = await legacyGoogleMapsClient.timezone({
-          params: {
-            key: env.GOOGLE_MAPS_SECRET,
-            location: { lat: input.lat, lng: input.lng },
-            timestamp: Math.floor(Date.now() / 1000),
-          },
-        });
-
-        if (response.data.status !== Status.OK) {
-          console.error("Timezone API error:", response.data.error_message);
-          throw new Error(`Failed to get timezone: ${response.data.status}`);
-        }
-
-        return {
-          timeZoneId: response.data.timeZoneId,
-          timeZoneName: response.data.timeZoneName,
-          rawOffset: response.data.rawOffset,
-          dstOffset: response.data.dstOffset,
-        };
-      } catch (error) {
-        console.error("Timezone processing error:", error);
-        throw new Error("Failed to fetch timezone information");
-      }
-    }),
+    .query(({ input }) => getTimezone(input)),
 
   placesAutocomplete: protectedProcedure
     .input(
       z.object({
         input: z.string().min(1),
-        // sessionToken: z.string().optional(), // TODO: Generate and pass from client
+        sessionToken: z.string().optional(),
       }),
     )
     .query(async ({ input }) => {
@@ -88,12 +118,24 @@ export const geoRouter = createTRPCRouter({
           // Requesting broader types to get countries and major cities/regions
           includedPrimaryTypes: [
             "country",
-            "locality",
-            "administrative_area_level_1",
+            "locality", // Cities
+            "administrative_area_level_1", // State/Provinces
           ],
           includeQueryPredictions: false, // Focus on actual places
+          locationBias: {
+            rectangle: {
+              low: {
+                latitude: 12.0, // Southern boundary (covers Yemen, southern Saudi Arabia)
+                longitude: 25.0, // Western boundary (covers Libya, Egypt)
+              },
+              high: {
+                latitude: 42.0, // Northern boundary (covers Turkey)
+                longitude: 65.0, // Eastern boundary (covers Iran, Afghanistan border)
+              },
+            },
+          },
           languageCode: "en",
-          // sessionToken: input.sessionToken, // TODO: Use session token
+          sessionToken: input.sessionToken,
         };
 
         const response = await placesClient.autocompletePlaces(request, {
@@ -133,7 +175,7 @@ export const geoRouter = createTRPCRouter({
     .input(
       z.object({
         placeId: z.string(),
-        // sessionToken: z.string().optional(), // TODO: Generate and pass from client (must be same as autocomplete)
+        sessionToken: z.string().optional(),
       }),
     )
     .query(async ({ input }) => {
@@ -141,7 +183,7 @@ export const geoRouter = createTRPCRouter({
         const placeDetailsRequest = {
           name: `places/${input.placeId}`, // Format for the new Places API
           languageCode: "en",
-          // sessionToken: input.sessionToken, // TODO: Use session token
+          sessionToken: input.sessionToken,
         };
 
         const response = await placesClient.getPlace(placeDetailsRequest, {
@@ -215,6 +257,21 @@ export const geoRouter = createTRPCRouter({
           ? place.id.substring(place.id.lastIndexOf("/") + 1)
           : input.placeId;
 
+        const { data: timezone, error } = await tryCatch(
+          getTimezone({
+            lat: place.location?.latitude ?? 0,
+            lng: place.location?.longitude ?? 0,
+          }),
+        );
+
+        if (error) {
+          console.error("Timezone error:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to fetch timezone information",
+          });
+        }
+
         return {
           placeId: extractedPlaceId,
           displayName: finalDisplayName, // Our cleaned-up display name
@@ -223,10 +280,14 @@ export const geoRouter = createTRPCRouter({
           country: country, // Extracted country
           latitude: place.location?.latitude ?? 0,
           longitude: place.location?.longitude ?? 0,
+          timezone,
         };
       } catch (error) {
         console.error("Place details error:", error);
-        throw new Error("Failed to fetch place details");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch place details",
+        });
       }
     }),
 });
