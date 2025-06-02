@@ -41,6 +41,7 @@ export function FajrCallTimingCard() {
         latitude: watchedLocationData?.latitude ?? 0,
         longitude: watchedLocationData?.longitude ?? 0,
         method: form.watch("calculationMethod"),
+        timezonestring: watchedLocationData?.timezone.timeZoneId ?? undefined,
       },
       {
         enabled: !!(
