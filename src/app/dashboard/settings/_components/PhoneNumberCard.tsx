@@ -17,11 +17,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import { useSession } from "@/server/auth/auth-client";
 import { Phone, Shield } from "lucide-react";
-import { useFormData } from "../page";
 
 export function PhoneNumberCard() {
-  const { form, isLoading } = useFormData();
+  const { data, isPending } = useSession();
+  const user = data?.user;
+  const userPhoneNumber = user?.phoneNumber ?? "+901234567890";
+  const isPhoneNumberVerified = user?.phoneNumberVerified ?? false;
 
   return (
     <Card>
@@ -42,17 +47,38 @@ export function PhoneNumberCard() {
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
             <p className="text-foreground font-medium">
-              {form.watch("phoneNumber")}
+              {/* The phone number should always exist but just in case */}
+              {isPending ? <Skeleton className="h-4 w-34" /> : userPhoneNumber}
             </p>
             <div className="flex items-center space-x-2">
-              <Shield className="h-4 w-4 text-green-500" />
-              <p className="text-sm text-green-600">Verified</p>
+              {isPending ? (
+                <Skeleton className="h-4 w-22" />
+              ) : (
+                <>
+                  <Shield
+                    className={cn(
+                      "h-4 w-4",
+                      { "text-green-600": isPhoneNumberVerified },
+                      { "text-red-500": !isPhoneNumberVerified },
+                    )}
+                  />
+                  <p
+                    className={cn(
+                      "text-sm",
+                      { "text-green-600": isPhoneNumberVerified },
+                      { "text-red-500": !isPhoneNumberVerified },
+                    )}
+                  >
+                    {isPhoneNumberVerified ? "Verified" : "Not Verified"}
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
           <Dialog>
             <DialogTrigger asChild>
-              <Button type="button" variant="outline" loading={isLoading}>
+              <Button type="button" variant="outline">
                 <Phone className="mr-2 h-4 w-4" />
                 Update Phone Number
               </Button>
@@ -69,7 +95,7 @@ export function PhoneNumberCard() {
               <div>
                 <PhoneOtpFlowForm
                   flowType="dialog"
-                  defaultPhoneNumber={form.watch("phoneNumber")}
+                  defaultPhoneNumber={user?.phoneNumber ?? ""}
                   showPrivacyPolicy={false}
                 />
 

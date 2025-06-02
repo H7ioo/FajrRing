@@ -14,7 +14,6 @@ import { DashboardLayout } from "../_components/DashboardLayout";
 import { CalculationMethodCard } from "./_components/CalculationMethodCard";
 import { FajrCallTimingCard } from "./_components/FajrCallTimingCard";
 import { LocationCard } from "./_components/LocationCard";
-import { PhoneNumberCard } from "./_components/PhoneNumberCard";
 
 const preferencesSchema = z.object({
   location: z.string().min(1, "Location is required"),
@@ -31,10 +30,6 @@ const preferencesSchema = z.object({
     .optional(),
   calculationMethod: PrayerCalculationMethodEnum,
   callOffset: z.array(z.number()).length(1),
-  phoneNumber: z
-    .string()
-    .min(1, "Phone number is required")
-    .regex(/^\+[1-9]\d{1,14}$/, "Please enter a valid phone number"),
   customFajrAngle: z.string().optional(),
   customIshaAngle: z.string().optional(),
 });
@@ -64,7 +59,6 @@ export default function PreferencesPage() {
       locationData: undefined,
       calculationMethod: undefined,
       callOffset: [0],
-      phoneNumber: "",
       customFajrAngle: "",
       customIshaAngle: "",
     },
@@ -97,9 +91,6 @@ export default function PreferencesPage() {
 
             {/* Fajr Call Timing Card */}
             <FajrCallTimingCard />
-
-            {/* Phone Number Card */}
-            <PhoneNumberCard />
 
             <div className="flex justify-end">
               <Button type="submit" size="lg" loading={isLoading}>

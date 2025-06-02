@@ -19,10 +19,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Save, Shield, Trash2, User } from "lucide-react";
+import { Shield, Trash2, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DashboardLayout } from "../_components/DashboardLayout";
+import { PhoneNumberCard } from "./_components/PhoneNumberCard";
 
 // TODO: Update phone number from here and have the account managment here in tabs
 
@@ -37,6 +38,9 @@ export default function Preferences() {
 
   return (
     <DashboardLayout title="Settings">
+      {/* Phone Number Card */}
+      <PhoneNumberCard />
+
       {/* Account Management Card */}
       <Card>
         <CardHeader>
@@ -98,13 +102,6 @@ export default function Preferences() {
           </div>
         </CardContent>
       </Card>
-
-      <div className="flex justify-end">
-        <Button type="submit" size="lg" loading={isLoading}>
-          <Save className="mr-2 h-4 w-4" />
-          Save Settings
-        </Button>
-      </div>
     </DashboardLayout>
   );
 }
