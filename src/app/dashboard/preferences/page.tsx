@@ -34,7 +34,7 @@ const preferencesSchema = z.object({
       }),
     })
     .optional(),
-  calculationMethod: PrayerCalculationMethodEnum,
+  calculationMethod: PrayerCalculationMethodEnum.optional(),
   callOffset: z.array(z.number()).length(1),
   customFajrAngle: z.string().optional(),
   customIshaAngle: z.string().optional(),

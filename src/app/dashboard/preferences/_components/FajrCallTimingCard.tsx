@@ -40,6 +40,7 @@ export function FajrCallTimingCard() {
           .replace(/\//g, "-"),
         latitude: watchedLocationData?.latitude ?? 0,
         longitude: watchedLocationData?.longitude ?? 0,
+        method: form.watch("calculationMethod"),
       },
       {
         enabled: !!(
@@ -59,7 +60,7 @@ export function FajrCallTimingCard() {
           <div>
             <CardTitle>Fajr Call Timing</CardTitle>
             <CardDescription>
-              When should we call you before Fajr prayer?{" "}
+              When should we call you for Fajr prayer?{" "}
               {prayerTimings?.timings.Fajr && (
                 <span
                   className={cn({
@@ -85,8 +86,8 @@ export function FajrCallTimingCard() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Call me {field.value[0]} minutes{" "}
-                {field.value[0]! >= 0 ? "before" : "after"} Fajr
+                Call me {Math.abs(field.value[0] ?? 0)} minutes{" "}
+                {field.value[0]! >= 0 ? "after" : "before"} Fajr
               </FormLabel>
               <FormControl>
                 <div>

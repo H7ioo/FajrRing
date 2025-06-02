@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -48,13 +49,22 @@ export function CalculationMethodCard() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calculation Method</FormLabel>
+              <FormDescription>
+                If not specified, it will be determined based on your location
+              </FormDescription>
               <Select
                 onValueChange={field.onChange}
                 defaultValue={field.value}
                 disabled={isLoading}
+                clearable
+                value={field.value}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    clearable
+                    value={field.value}
+                    onClear={() => field.onChange(undefined)}
+                  >
                     <SelectValue placeholder="Select calculation method" />
                   </SelectTrigger>
                 </FormControl>

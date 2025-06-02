@@ -1,15 +1,32 @@
 "use client";
 
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, X } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+// @see https://github.com/radix-ui/primitives/issues/1569#issuecomment-1434801848
+// You have to pass value and clearable to work
 function Select({
+  clearable = false,
+  value,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />;
+}: React.ComponentProps<typeof SelectPrimitive.Root> & {
+  clearable?: boolean;
+  value?: string;
+}) {
+  // Use key to force re-render when value changes to undefined/null
+  const key = clearable ? `select-${value ?? "empty"}` : undefined;
+
+  return (
+    <SelectPrimitive.Root
+      key={key}
+      data-slot="select"
+      value={value}
+      {...props}
+    />
+  );
 }
 
 function SelectGroup({
@@ -24,14 +41,24 @@ function SelectValue({
   return <SelectPrimitive.Value data-slot="select-value" {...props} />;
 }
 
+// You have to reset field on onClear and pass value with clearable
 function SelectTrigger({
   className,
   size = "default",
   children,
+  clearable = false,
+  onClear,
+  value,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default";
+  clearable?: boolean;
+  onClear?: () => void;
+  value?: string;
 }) {
+  const showClearButton =
+    clearable && value && value !== "" && value !== undefined;
+
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
@@ -43,9 +70,29 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
-      </SelectPrimitive.Icon>
+      <div className="flex items-center gap-1">
+        {showClearButton && (
+          <button
+            type="button"
+            className="hover:bg-muted pointer-events-auto z-10 flex h-4 w-4 items-center justify-center rounded-sm transition-colors"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClear?.();
+            }}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            tabIndex={-1}
+          >
+            <X className="size-3" />
+          </button>
+        )}
+        <SelectPrimitive.Icon asChild>
+          <ChevronDownIcon className="size-4 opacity-50" />
+        </SelectPrimitive.Icon>
+      </div>
     </SelectPrimitive.Trigger>
   );
 }
