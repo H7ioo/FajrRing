@@ -36,8 +36,8 @@ const preferencesSchema = z.object({
     .optional(),
   calculationMethod: PrayerCalculationMethodEnum.optional(),
   callOffset: z.array(z.number()).length(1),
-  customFajrAngle: z.string().optional(),
-  customIshaAngle: z.string().optional(),
+  // customFajrAngle: z.string().optional(),
+  // customIshaAngle: z.string().optional(),
 });
 
 export type PreferencesFormData = z.infer<typeof preferencesSchema>;
@@ -65,8 +65,8 @@ export default function PreferencesPage() {
       locationData: undefined,
       calculationMethod: undefined,
       callOffset: [0],
-      customFajrAngle: "",
-      customIshaAngle: "",
+      // customFajrAngle: "",
+      // customIshaAngle: "",
     },
   });
 

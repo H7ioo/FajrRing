@@ -27,7 +27,8 @@ export default async function DashboardSectionLayout({
         <DashboardSidebar user={user} />
         <div className="flex flex-1 flex-col overflow-hidden">
           <DashboardHeader user={user} />
-          <main className="bg-muted/30 flex-1 overflow-y-auto p-4 pt-6 md:p-6 lg:p-8">
+          {/* bg-muted/30 fafcfd */}
+          <main className="z-10 flex-1 overflow-y-auto bg-[#fafcfd] p-4 pt-6 md:p-6 lg:p-8">
             <div className="mx-auto max-w-7xl space-y-6">{children}</div>
           </main>
         </div>
