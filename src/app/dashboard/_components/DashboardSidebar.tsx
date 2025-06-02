@@ -1,6 +1,12 @@
 "use client";
 
-import { Home, ListCollapse, PanelRightClose, Settings } from "lucide-react";
+import {
+  Home,
+  ListCollapse,
+  PanelRightClose,
+  Settings,
+  Settings2,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
@@ -52,6 +58,11 @@ export function DashboardSidebar({ user }: AppSidebarProps) {
       icon: <ListCollapse className="h-4 w-4" />,
       label: "Call History",
       href: "/dashboard/history",
+    },
+    {
+      icon: <Settings2 className="h-4 w-4" />,
+      label: "Preferences",
+      href: "/dashboard/preferences",
     },
     {
       icon: <Settings className="h-4 w-4" />,

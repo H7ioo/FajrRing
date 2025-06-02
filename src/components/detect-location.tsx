@@ -8,6 +8,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import type { LocationData } from "./address-autocomplete-input";
 
+// TODO: re-write
+
 interface DetectLocationProps {
   onLocationDetected: (location: LocationData) => void;
   disabled?: boolean;

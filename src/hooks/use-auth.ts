@@ -88,13 +88,16 @@ export function useAuth() {
   const loginWithPhoneNumberAndOtp = async ({
     phoneNumber,
     otp,
+    updatePhoneNumber,
   }: {
     phoneNumber: string;
     otp: string;
+    updatePhoneNumber?: boolean;
   }) => {
     await authClient.phoneNumber.verify({
       phoneNumber,
       code: otp,
+      updatePhoneNumber,
       fetchOptions: {
         onSuccess: createSuccessHandler({
           title: "Login Successful!",
@@ -103,6 +106,31 @@ export function useAuth() {
         }),
         onError: createErrorHandler({
           title: "Login Failed. Please check the code.",
+        }),
+      },
+    });
+  };
+
+  const changePhoneNumberWithOtp = async ({
+    phoneNumber,
+    otp,
+    updatePhoneNumber,
+  }: {
+    phoneNumber: string;
+    otp: string;
+    updatePhoneNumber?: boolean;
+  }) => {
+    await authClient.phoneNumber.verify({
+      phoneNumber,
+      code: otp,
+      updatePhoneNumber,
+      fetchOptions: {
+        onSuccess: createSuccessHandler({
+          title: "Phone Number Changed Successfully!",
+          shouldRefetchSession: true,
+        }),
+        onError: createErrorHandler({
+          title: "Failed to change phone number. Please try again.",
         }),
       },
     });
@@ -161,6 +189,7 @@ export function useAuth() {
     loginWithOAuth,
     loginWithPhoneNumberAndPassword,
     loginWithPhoneNumberAndOtp,
+    changePhoneNumberWithOtp,
     sendPhoneNumberOTP,
     registerWithPhoneNumberAndOtp,
     logout,

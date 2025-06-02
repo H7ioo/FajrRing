@@ -13,6 +13,8 @@ import { Loader2, MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 
+// TODO: re-write
+
 export interface LocationData {
   placeId: string;
   displayName: string;
@@ -49,7 +51,7 @@ export function AddressAutocompleteInput({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [debouncedSearchText] = useDebounce(currentSearchText, 300);
+  const [debouncedSearchText] = useDebounce(currentSearchText, 350);
 
   useEffect(() => {
     setCurrentSearchText(value);
