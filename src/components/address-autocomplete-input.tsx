@@ -24,8 +24,8 @@ export interface LocationData {
   latitude: number;
   longitude: number;
   timezone: {
-    timeZoneId: string;
-    timeZoneName: string;
+    timezoneId: string;
+    timezoneName: string;
     rawOffset: number;
     dstOffset: number;
   };
@@ -126,8 +126,8 @@ export function AddressAutocompleteInput({
         latitude: placeDetails.latitude,
         longitude: placeDetails.longitude,
         timezone: {
-          timeZoneId: placeDetails.timezone.timeZoneId,
-          timeZoneName: placeDetails.timezone.timeZoneName,
+          timezoneId: placeDetails.timezone.timezoneId,
+          timezoneName: placeDetails.timezone.timezoneName,
           rawOffset: placeDetails.timezone.rawOffset,
           dstOffset: placeDetails.timezone.dstOffset,
         },
@@ -173,8 +173,8 @@ export function AddressAutocompleteInput({
       latitude: 0,
       longitude: 0,
       timezone: {
-        timeZoneId: "",
-        timeZoneName: "",
+        timezoneId: "",
+        timezoneName: "",
         rawOffset: 0,
         dstOffset: 0,
       },

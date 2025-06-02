@@ -100,7 +100,7 @@ export default async function DashboardPage() {
                     {nextCallTime.toLocaleTimeString("en-US", {
                       hour: "2-digit",
                       minute: "2-digit",
-                      timeZoneName: "short",
+                      timezoneName: "short",
                     })}
                   </p>
                 </div>

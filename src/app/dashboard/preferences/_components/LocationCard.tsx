@@ -28,12 +28,12 @@ export function LocationCard() {
     if (
       watchedTimezone?.rawOffset !== undefined &&
       watchedTimezone?.dstOffset !== undefined &&
-      watchedTimezone?.timeZoneName
+      watchedTimezone?.timezoneName
     ) {
       const offset =
         (watchedTimezone.rawOffset + watchedTimezone.dstOffset) / 3600;
       const offsetString = offset >= 0 ? `+${offset}` : `${offset}`;
-      return `GMT${offsetString} (${watchedTimezone.timeZoneName})`;
+      return `GMT${offsetString} (${watchedTimezone.timezoneName})`;
     } else {
       const now = new Date();
       const offset = -now.getTimezoneOffset() / 60;

@@ -28,8 +28,8 @@ const getTimezone = async ({ lat, lng }: { lat: number; lng: number }) => {
     }
 
     return {
-      timeZoneId: response.data.timeZoneId,
-      timeZoneName: response.data.timeZoneName,
+      timezoneId: response.data.timezoneId,
+      timezoneName: response.data.timezoneName,
       rawOffset: response.data.rawOffset,
       dstOffset: response.data.dstOffset,
     };

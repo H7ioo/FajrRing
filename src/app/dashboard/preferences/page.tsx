@@ -27,8 +27,8 @@ const preferencesSchema = z.object({
       latitude: z.number(),
       longitude: z.number(),
       timezone: z.object({
-        timeZoneId: z.string(),
-        timeZoneName: z.string(),
+        timezoneId: z.string(),
+        timezoneName: z.string(),
         rawOffset: z.number(),
         dstOffset: z.number(),
       }),

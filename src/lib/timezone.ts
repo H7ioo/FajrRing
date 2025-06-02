@@ -6,7 +6,7 @@ export function getTimezoneInfo(latitude?: number, longitude?: number) {
   }
 
   // Use the browser's timezone as fallback
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timezone;
 
   // Get current date to calculate offset
   const now = new Date();
@@ -18,11 +18,11 @@ export function getTimezoneInfo(latitude?: number, longitude?: number) {
   // Get timezone name
   const timezoneName =
     new Intl.DateTimeFormat("en", {
-      timeZoneName: "long",
-      timeZone: userTimezone,
+      timezoneName: "long",
+      timezone: userTimezone,
     })
       .formatToParts(now)
-      .find((part) => part.type === "timeZoneName")?.value ?? "";
+      .find((part) => part.type === "timezoneName")?.value ?? "";
 
   return `GMT${offsetString} (${timezoneName})`;
 }
