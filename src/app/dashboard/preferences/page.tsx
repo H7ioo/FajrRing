@@ -14,6 +14,7 @@ import { DashboardLayout } from "../_components/DashboardLayout";
 import { CalculationMethodCard } from "./_components/CalculationMethodCard";
 import { FajrCallTimingCard } from "./_components/FajrCallTimingCard";
 import { LocationCard } from "./_components/LocationCard";
+import { CallStatusCard } from "./_components/StatusCard";
 
 const preferencesSchema = z.object({
   location: z.string().min(1, "Location is required"),
@@ -36,6 +37,7 @@ const preferencesSchema = z.object({
     .optional(),
   calculationMethod: PrayerCalculationMethodEnum.optional(),
   callOffset: z.array(z.number()).length(1),
+  callsEnabled: z.boolean().default(true).optional(),
   // customFajrAngle: z.string().optional(),
   // customIshaAngle: z.string().optional(),
 });
@@ -56,6 +58,7 @@ export function useFormData() {
 export default function PreferencesPage() {
   const [isLoading, setIsLoading] = useState(false);
 
+  // TODO: Save preferences + fetch them
   const {} = usePreferences();
 
   const form = useForm<PreferencesFormData>({
@@ -65,6 +68,7 @@ export default function PreferencesPage() {
       locationData: undefined,
       calculationMethod: undefined,
       callOffset: [0],
+      callsEnabled: true,
       // customFajrAngle: "",
       // customIshaAngle: "",
     },
@@ -97,6 +101,9 @@ export default function PreferencesPage() {
 
             {/* Fajr Call Timing Card */}
             <FajrCallTimingCard />
+
+            {/* Status Card */}
+            <CallStatusCard />
 
             <div className="flex justify-end">
               <Button type="submit" size="lg" loading={isLoading}>

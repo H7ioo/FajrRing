@@ -127,6 +127,7 @@ export const verification = createTable("verification", (t) => ({
     .$onUpdate(() => new Date()),
 }));
 
+// TODO: Extend the location
 export const preference = createTable("preference", (t) => ({
   id: t.uuid("id").primaryKey().defaultRandom(),
   userId: t
