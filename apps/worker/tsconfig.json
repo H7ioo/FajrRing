@@ -4,8 +4,8 @@
     "baseUrl": ".",
     "module": "ESNext",
     "target": "ES2022",
-    "outDir": "dist",
-    "composite": true,
+    "noEmit": true,
+    "composite": false,
     "incremental": true,
     "isolatedModules": true,
     "allowJs": true,
@@ -16,5 +16,5 @@
     }
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", ".turbo", "dist"]
+  "exclude": ["node_modules", ".turbo"]
 }
