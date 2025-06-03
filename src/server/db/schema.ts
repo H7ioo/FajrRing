@@ -132,7 +132,8 @@ export const preference = createTable("preference", (t) => ({
   userId: t
     .text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => user.id, { onDelete: "cascade" })
+    .unique(), // One user can only have one preference
 
   // Location Data (Select input) - displayName
   location: t.text("location"),

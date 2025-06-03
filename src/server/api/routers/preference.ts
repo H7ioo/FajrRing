@@ -1,5 +1,5 @@
 import { preferencesSchema } from "@/lib/validations/preference";
-import { preference, user } from "@/server/db/schema";
+import { preference } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -24,6 +24,6 @@ export const preferenceRouter = createTRPCRouter({
           userId: ctx.session.user.id,
           ...set,
         })
-        .onConflictDoUpdate({ target: user.id, set });
+        .onConflictDoUpdate({ target: preference.userId, set });
     }),
 });
