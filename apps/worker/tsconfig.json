@@ -4,8 +4,6 @@
     "baseUrl": ".",
     "module": "ESNext",
     "target": "ES2022",
-    "declaration": false,
-    "sourceMap": true,
     "noEmit": true,
     "composite": false,
     "incremental": true,
