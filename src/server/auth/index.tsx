@@ -7,11 +7,24 @@ import { nextCookies } from "better-auth/next-js";
 import { phoneNumber } from "better-auth/plugins/phone-number";
 import { headers } from "next/headers";
 import { cache } from "react";
+import { preference } from "../db/schema";
 
 export const betterAuth = betterAuthClient({
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          // Create a preference for the user
+          await db.insert(preference).values({
+            userId: user.id,
+          });
+        },
+      },
+    },
+  },
   socialProviders: {
     google: {
       clientId: env.BETTER_AUTH_GOOGLE_ID,

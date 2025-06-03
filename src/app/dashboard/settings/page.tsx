@@ -25,8 +25,6 @@ import { toast } from "sonner";
 import { DashboardLayout } from "../_components/DashboardLayout";
 import { PhoneNumberCard } from "./_components/PhoneNumberCard";
 
-// TODO: Update phone number from here and have the account managment here in tabs
-
 export default function Preferences() {
   const [isLoading, setIsLoading] = useState(false);
 

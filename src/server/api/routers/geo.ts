@@ -4,7 +4,7 @@ import { env } from "@/env";
 import { tryCatch } from "@/lib/utils";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { Client, Status } from "@googlemaps/google-maps-services-js";
-import { PlacesClient } from "@googlemaps/places"; // Using the new Places API Client
+import { PlacesClient } from "@googlemaps/places";
 import { TRPCError } from "@trpc/server";
 
 const legacyGoogleMapsClient = new Client(); // For older methods if needed
@@ -28,8 +28,8 @@ const getTimezone = async ({ lat, lng }: { lat: number; lng: number }) => {
     }
 
     return {
-      timezoneId: response.data.timezoneId,
-      timezoneName: response.data.timezoneName,
+      timezoneId: response.data.timeZoneId,
+      timezoneName: response.data.timeZoneName,
       rawOffset: response.data.rawOffset,
       dstOffset: response.data.dstOffset,
     };

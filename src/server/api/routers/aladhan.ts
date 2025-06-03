@@ -8,7 +8,7 @@ import {
   AladhanTimingsInputSchema,
   type AladhanApiResponse,
   type AladhanNextPrayerResponse,
-} from "@/lib/aladhan";
+} from "@/lib/validations/aladhan";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import axios from "axios";

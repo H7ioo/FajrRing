@@ -40,7 +40,7 @@ export function FajrCallTimingCard() {
           .replace(/\//g, "-"),
         latitude: watchedLocationData?.latitude ?? 0,
         longitude: watchedLocationData?.longitude ?? 0,
-        method: form.watch("calculationMethod"),
+        method: form.watch("calculationMethodId"),
         timezonestring: watchedLocationData?.timezone.timezoneId ?? undefined,
       },
       {
@@ -71,7 +71,7 @@ export function FajrCallTimingCard() {
                   (
                   {addMinutesToTimeString(
                     prayerTimings?.timings.Fajr ?? "",
-                    form.watch("callOffset")[0]!,
+                    form.watch("fajrOffsetMinutes")[0]!,
                   )}
                   )
                 </span>
@@ -83,7 +83,7 @@ export function FajrCallTimingCard() {
       <CardContent className="space-y-4">
         <FormField
           control={form.control}
-          name="callOffset"
+          name="fajrOffsetMinutes"
           render={({ field }) => (
             <FormItem>
               <FormLabel>

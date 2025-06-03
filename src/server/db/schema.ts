@@ -127,23 +127,47 @@ export const verification = createTable("verification", (t) => ({
     .$onUpdate(() => new Date()),
 }));
 
-// TODO: Extend the location
 export const preference = createTable("preference", (t) => ({
   id: t.uuid("id").primaryKey().defaultRandom(),
   userId: t
     .text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+
+  // Location Data (Select input) - displayName
+  location: t.text("location"),
+
+  // Google Places API settings
+  placeId: t.text("place_id"),
+  formattedAddress: t.text("formatted_address"),
+  city: t.text("city"),
+  country: t.text("country"),
+
+  // Coordinates
   latitude: t.doublePrecision("latitude"),
   longitude: t.doublePrecision("longitude"),
-  timezone: t.text("timezone"), // Europe/Berlin
-  prayerMethodId: t.text("prayer_method_id"),
+
+  // Google Timezone
+  timezoneId: t.text("timezone"), // Europe/Berlin
+  timezoneName: t.text("timezone_name"),
+  rawOffset: t.integer("raw_offset"),
+  dstOffset: t.integer("dst_offset"),
+
+  // Aladhan Calculation Method
+  calculationMethodId: t.text("calculation_method_id"),
+
+  // Call Timing
   fajrOffsetMinutes: t.integer("fajr_offset_minutes").default(0),
+
+  // Call Scheduling & Status
   nextCallTimeUtc: t.timestamp("next_call_time", {
     mode: "date",
     withTimezone: true,
   }),
-  isActive: t.boolean("is_active").notNull().default(true),
+
+  // Is Active
+  callsEnabled: t.boolean("calls_enabled").notNull().default(true),
+
   createdAt: t
     .timestamp("created_at", { withTimezone: true, mode: "date" })
     .default(sql`CURRENT_TIMESTAMP`)

@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { prayerCalculationMethods } from "@/lib/aladhan";
+import { prayerCalculationMethods } from "@/lib/validations/aladhan";
 import { Calculator } from "lucide-react";
 import { useFormData } from "../page";
 
@@ -45,7 +45,7 @@ export function CalculationMethodCard() {
       <CardContent className="space-y-4">
         <FormField
           control={form.control}
-          name="calculationMethod"
+          name="calculationMethodId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calculation Method</FormLabel>

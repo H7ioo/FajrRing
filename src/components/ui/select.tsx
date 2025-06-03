@@ -72,8 +72,9 @@ function SelectTrigger({
       {children}
       <div className="flex items-center gap-1">
         {showClearButton && (
-          <button
-            type="button"
+          // Prevent "In HTML, <button> cannot be a descendant of <button>"
+          <div
+            role="button"
             className="hover:bg-muted pointer-events-auto z-10 flex h-4 w-4 items-center justify-center rounded-sm transition-colors"
             onClick={(e) => {
               e.preventDefault();
@@ -87,7 +88,7 @@ function SelectTrigger({
             tabIndex={-1}
           >
             <X className="size-3" />
-          </button>
+          </div>
         )}
         <SelectPrimitive.Icon asChild>
           <ChevronDownIcon className="size-4 opacity-50" />
