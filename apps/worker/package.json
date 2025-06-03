@@ -1,0 +1,17 @@
+{
+  "name": "worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --loader ts-node/esm src/index.ts"
+  },
+  "dependencies": {
+    "bull": "^4.16.5"
+  },
+  "devDependencies": {
+    "@fajr-ring/tsconfig": "workspace:*",
+    "@types/bull": "^4.10.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  }
+}

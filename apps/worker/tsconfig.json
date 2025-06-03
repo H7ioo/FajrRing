@@ -1,0 +1,22 @@
+{
+  "extends": "@fajr-ring/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ESNext",
+    "target": "ES2022",
+    "declaration": false,
+    "sourceMap": true,
+    "noEmit": true,
+    "composite": false,
+    "incremental": true,
+    "isolatedModules": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", ".turbo"]
+}
