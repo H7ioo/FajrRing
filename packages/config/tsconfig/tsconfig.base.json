@@ -18,7 +18,12 @@
     "target": "es2022",
     "module": "esnext",
     "lib": ["es2022"],
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      // @see https://github.com/microsoft/TypeScript/issues/61504
+      // @see https://turborepo.com/docs/core-concepts/internal-packages#limitations-and-tradeoffs
+      "#*": ["./src/*"]
+    }
   },
   "exclude": ["node_modules", "dist", ".turbo"]
 }

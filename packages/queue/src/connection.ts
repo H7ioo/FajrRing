@@ -1,5 +1,5 @@
 import IORedis from "ioredis";
-import { env } from "./env";
+import { env } from "#env";
 
 const redisUrl = env.REDIS_DATABASE_URL || "redis://localhost:6379";
 

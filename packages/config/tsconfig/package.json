@@ -1,9 +1,8 @@
 {
   "name": "@fajr-ring/tsconfig",
-  "version": "0.1.0",
   "private": true,
   "files": [
-    "base.json",
-    "nextjs.json"
+    "tsconfig.base.json",
+    "tsconfig.nextjs.json"
   ]
 }

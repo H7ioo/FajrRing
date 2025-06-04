@@ -1,16 +1,11 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "globalDependencies": ["tsconfig.json", ".env"],
+  "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "apps/web/.next/**",
-        "!apps/web/.next/cache/**",
-        "apps/worker/dist/**",
-        "packages/db/dist/**",
-        "packages/shared-types/dist/**"
-      ]
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {},
     "check-types": {

@@ -1,8 +1,8 @@
 {
-  "extends": "@fajr-ring/tsconfig/base.json",
+  "extends": "@fajr-ring/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "module": "ESNext",
+    "module": "nodenext",
     "target": "ES2022",
     "noEmit": true,
     "composite": false,
@@ -10,11 +10,10 @@
     "isolatedModules": true,
     "allowJs": true,
     "esModuleInterop": true,
-    "moduleResolution": "bundler",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "moduleResolution": "nodenext",
+    "lib": ["ESNext"]
   },
-  "include": ["**/*.ts"],
+
+  "include": ["**/*.ts", "**/*.js"],
   "exclude": ["node_modules", ".turbo"]
 }

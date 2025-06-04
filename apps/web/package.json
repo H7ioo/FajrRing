@@ -1,6 +1,5 @@
 {
-  "name": "@fajr-ring/web",
-  "version": "0.1.0",
+  "name": "web",
   "private": true,
   "type": "module",
   "scripts": {

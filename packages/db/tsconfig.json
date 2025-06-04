@@ -1,17 +1,13 @@
 {
-  "extends": "@fajr-ring/tsconfig/base.json",
+  "extends": "@fajr-ring/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "module": "ESNext",
     "noEmit": true,
     "incremental": true,
     "isolatedModules": true,
     "allowJs": true,
-
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "baseUrl": "."
   },
-  "include": ["**/*.ts", "**/*.js"], // For @/env
+  "include": ["**/*.ts", "**/*.js"],
   "exclude": ["node_modules"]
 }
