@@ -12,6 +12,7 @@ import { ZodError } from "zod";
 
 import { db } from "@fajr-ring/db";
 import { auth } from "../auth";
+import { TRPCErrorWithAction } from "./error";
 
 /**
  * 1. CONTEXT
@@ -48,6 +49,8 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
+        metaError:
+          error.cause instanceof TRPCErrorWithAction ? error.cause.meta : null,
         zodError:
           error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
