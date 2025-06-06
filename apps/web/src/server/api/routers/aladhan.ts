@@ -12,6 +12,7 @@ import {
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import axios from "axios";
+import type { z } from "zod";
 
 // Helper function to build query parameters dynamically
 const buildQueryParams = (params: Record<string, unknown>): URLSearchParams => {
@@ -145,22 +146,28 @@ const makeNextPrayerApiCall = async (url: string) => {
   }
 };
 
+export const getPrayerTimingsByDate = async ({
+  input,
+}: {
+  input: z.infer<typeof AladhanTimingsInputSchema>;
+}) => {
+  const { dateString, latitude, longitude, ...optionalParams } = input;
+
+  const queryParams = buildQueryParams({
+    latitude,
+    longitude,
+    ...optionalParams,
+  });
+
+  const url = `https://api.aladhan.com/v1/timings/${dateString}?${queryParams.toString()}`;
+  return makePrayerTimesApiCall(url);
+};
+
 export const aladhanRouter = createTRPCRouter({
   // Get prayer times by coordinates and date
   getPrayerTimingsByDate: protectedProcedure
     .input(AladhanTimingsInputSchema)
-    .query(async ({ input }) => {
-      const { dateString, latitude, longitude, ...optionalParams } = input;
-
-      const queryParams = buildQueryParams({
-        latitude,
-        longitude,
-        ...optionalParams,
-      });
-
-      const url = `https://api.aladhan.com/v1/timings/${dateString}?${queryParams.toString()}`;
-      return makePrayerTimesApiCall(url);
-    }),
+    .query(async ({ input }) => await getPrayerTimingsByDate({ input })),
 
   // Get prayer times by address and date
   getPrayerTimingsByAddress: protectedProcedure

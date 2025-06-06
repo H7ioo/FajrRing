@@ -38,6 +38,8 @@ interface AppSidebarProps {
   user: UserSession | null | undefined;
 }
 
+// TODO: Control page for controlling the queue if something wrong happens. Example: remove all jobs, see all jobs, force stop/ start job etc.
+
 export function DashboardSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname();
   const { setOpenMobile, toggleSidebar, isMobile, state } = useSidebar();

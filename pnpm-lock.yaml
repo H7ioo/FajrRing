@@ -17,6 +17,9 @@ importers:
       '@fajr-ring/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@fajr-ring/queue':
+        specifier: workspace:*
+        version: link:../../packages/queue
       '@googlemaps/google-maps-services-js':
         specifier: ^3.4.1
         version: 3.4.1
@@ -237,12 +240,18 @@ importers:
 
   apps/worker:
     dependencies:
+      '@fajr-ring/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@fajr-ring/queue':
         specifier: workspace:*
         version: link:../../packages/queue
       bullmq:
         specifier: ^5.53.2
         version: 5.53.2
+      drizzle-orm:
+        specifier: ^0.41.0
+        version: 0.41.0(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(gel@2.1.0)(kysely@0.28.2)(postgres@3.4.7)(prisma@5.22.0)
       ioredis:
         specifier: ^5.6.1
         version: 5.6.1

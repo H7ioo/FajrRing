@@ -1,3 +1,4 @@
-export interface CallJobData {
+export type CallJobData = {
   userId: string;
-}
+  phoneNumber: string;
+};

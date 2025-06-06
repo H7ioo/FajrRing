@@ -2,7 +2,7 @@
   "extends": "@fajr-ring/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "module": "nodenext",
+    "module": "ESNext",
     "target": "ES2022",
     "noEmit": true,
     "composite": false,
@@ -10,7 +10,7 @@
     "isolatedModules": true,
     "allowJs": true,
     "esModuleInterop": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "Bundler",
     "lib": ["ESNext"]
   },
 

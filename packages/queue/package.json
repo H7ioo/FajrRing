@@ -20,7 +20,7 @@
   },
   "exports": {
     "./queue": "./src/queue.ts",
-    "./addJob": "./src/addJob.ts",
+    "./jobs": "./src/jobs.ts",
     "./connection": "./src/connection.ts",
     "./types": "./src/types.ts"
   },

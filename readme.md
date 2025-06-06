@@ -28,3 +28,4 @@ Like turbo build --filter=web and turbo run web#build
 - [ ] Adding environment variables to task hashes [see](https://turborepo.com/docs/crafting-your-repository/using-environment-variables)
 - [ ] Add [eslint-config-turbo](https://turborepo.com/docs/reference/eslint-config-turbo)
 - [ ] Try SPA inside of the dashboard router using react-router see josh twitter
+- [ ] Add bull-board to NextJs [see issue](https://github.com/felixmosh/bull-board/issues/124)
