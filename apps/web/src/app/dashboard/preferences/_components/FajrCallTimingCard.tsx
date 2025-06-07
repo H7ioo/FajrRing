@@ -13,12 +13,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Slider } from "@/components/ui/slider";
+import { useFormData } from "@/hooks/use-form-data";
 import { addMinutesToTimeString } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { Clock } from "lucide-react";
 import { useWatch } from "react-hook-form";
-import { useFormData } from "../page";
 
 export function FajrCallTimingCard() {
   const { form, isLoading } = useFormData();

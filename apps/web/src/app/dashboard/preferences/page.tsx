@@ -2,38 +2,23 @@
 
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { FormContext } from "@/hooks/use-form-data";
 import { usePreferences } from "@/hooks/use-preferences";
 import {
   preferencesSchema,
   type PreferencesFormData,
 } from "@/lib/validations/preference";
+import { useSession } from "@/server/auth/auth-client";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Save } from "lucide-react";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type Context,
-} from "react";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { DashboardLayout } from "../_components/DashboardLayout";
 import { CalculationMethodCard } from "./_components/CalculationMethodCard";
 import { FajrCallTimingCard } from "./_components/FajrCallTimingCard";
 import { LocationCard } from "./_components/LocationCard";
 import { CallStatusCard } from "./_components/StatusCard";
-
-export type FormContextType = {
-  form: UseFormReturn<PreferencesFormData>;
-  isLoading: boolean;
-};
-
-const FormContext = createContext<FormContextType | null>(null);
-
-export function useFormData() {
-  return useContext(FormContext as Context<FormContextType>);
-}
 
 function PreferencesLoading() {
   return (
@@ -52,11 +37,16 @@ function PreferencesLoading() {
 export default function PreferencesPage() {
   const [isLoading, setIsLoading] = useState(false);
 
+  const { data: session, isPending: isSessionPending } = useSession();
+  const user = session?.user;
+
   const { savePreferencesMutation } = usePreferences();
   const { mutate: savePreferences } = savePreferencesMutation;
 
   const { data: preferences, isLoading: isLoadingPreferences } =
     api.preference.get.useQuery();
+
+  console.log({ isLoadingPreferences, isSessionPending });
 
   const form = useForm<PreferencesFormData>({
     resolver: zodResolver(preferencesSchema),
@@ -104,12 +94,12 @@ export default function PreferencesPage() {
   }, [preferences]);
 
   return (
-    <FormContext.Provider value={{ form, isLoading }}>
+    <FormContext.Provider value={{ form, isLoading, user }}>
       <DashboardLayout
         title="Preferences"
         description="Customize your FajrRing experience"
       >
-        {isLoadingPreferences ? (
+        {isLoadingPreferences || isSessionPending ? (
           <PreferencesLoading />
         ) : (
           <Form {...form}>

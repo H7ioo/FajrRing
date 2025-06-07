@@ -13,11 +13,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import { useFormData } from "@/hooks/use-form-data";
 import { Phone } from "lucide-react";
-import { useFormData } from "../page";
 
 export function CallStatusCard() {
-  const { form, isLoading } = useFormData();
+  const { form, isLoading, user } = useFormData();
 
   return (
     <Card>
@@ -52,7 +52,7 @@ export function CallStatusCard() {
               </div>
               <FormControl>
                 <Switch
-                  disabled={isLoading}
+                  disabled={isLoading || !user?.phoneNumber}
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />

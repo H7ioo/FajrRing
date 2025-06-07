@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form";
+import { useFormData } from "@/hooks/use-form-data";
 import { MapPin } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { useWatch } from "react-hook-form";
@@ -14,7 +15,6 @@ import {
   type LocationData,
 } from "../../../../components/address-autocomplete-input";
 import { DetectLocation } from "../../../../components/detect-location";
-import { useFormData } from "../page";
 
 export function LocationCard() {
   const { form, isLoading } = useFormData();

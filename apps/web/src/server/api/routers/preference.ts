@@ -5,6 +5,7 @@ import { preference } from "@fajr-ring/db/schema";
 import { removeCallSchedule, scheduleCall } from "@fajr-ring/queue/jobs";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import { TRPCErrorWithAction } from "../error";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { getPrayerTimingsByDate } from "./aladhan";
 
@@ -20,6 +21,8 @@ export const preferenceRouter = createTRPCRouter({
       const set = {
         ...input,
         fajrOffsetMinutes: input.fajrOffsetMinutes[0],
+        // if user doesn't have phone number, disable calls
+        callsEnabled: ctx.session.user.phoneNumber ? input.callsEnabled : false,
         ...input.locationData,
         ...input.locationData?.timezone,
       };
@@ -44,16 +47,25 @@ export const preferenceRouter = createTRPCRouter({
       } catch (error) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to save preferences",
+          message: "Failed to save preferences. Please try again...",
         });
       }
 
       if (input.callsEnabled) {
-        // TODO: add "take action"
         if (!ctx.session.user.phoneNumber) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Phone number is not set",
+            message:
+              "Phone number is not set. Please set your phone number in settings",
+            cause: new TRPCErrorWithAction("Phone number is not set", {
+              toast: {
+                action: {
+                  type: "redirect",
+                  url: "/dashboard/settings",
+                  label: "Go to settings",
+                },
+              },
+            }),
           });
         }
 
@@ -75,11 +87,18 @@ export const preferenceRouter = createTRPCRouter({
           }),
         );
 
-        // TODO: add "take action"
         if (error) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to get prayer timings",
+            cause: new TRPCErrorWithAction("Failed to get prayer timings", {
+              toast: {
+                action: {
+                  type: "retry",
+                  retryFn: "scheduleCall",
+                },
+              },
+            }),
           });
         }
 
@@ -96,22 +115,36 @@ export const preferenceRouter = createTRPCRouter({
           }),
         );
 
-        // TODO: Add a UI button to check the queue and retry - "take action"
         if (queueError) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to schedule call. Please try again...",
+            cause: new TRPCErrorWithAction("Failed to schedule call", {
+              toast: {
+                action: {
+                  type: "retry",
+                  retryFn: "scheduleCall",
+                },
+              },
+            }),
           });
         }
       } else {
         const { error } = await tryCatch(
           removeCallSchedule(ctx.session.user.id),
         );
-        // TODO: add "take action"
         if (error) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to remove call schedule. Please try again...",
+            cause: new TRPCErrorWithAction("Failed to remove call schedule", {
+              toast: {
+                action: {
+                  type: "retry",
+                  retryFn: "removeCallSchedule",
+                },
+              },
+            }),
           });
         }
       }

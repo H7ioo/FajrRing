@@ -20,9 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useFormData } from "@/hooks/use-form-data";
 import { prayerCalculationMethods } from "@/lib/validations/aladhan";
 import { Calculator } from "lucide-react";
-import { useFormData } from "../page";
 
 export function CalculationMethodCard() {
   const { form, isLoading } = useFormData();
