@@ -38,6 +38,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
     fields: [user.id],
     references: [preference.userId],
   }),
+  callLogs: many(callLog),
 }));
 
 export const session = createTable(
@@ -146,6 +147,7 @@ export const preference = createTable("preference", (t) => ({
   // Call Timing
   fajrOffsetMinutes: t.integer("fajr_offset_minutes").default(0),
 
+  // TODO: Not relevant anymore. Deprecated
   // Call Scheduling & Status
   nextCallTimeUtc: t.timestamp("next_call_time", {
     mode: "date",
@@ -172,47 +174,51 @@ export const preferenceRelations = relations(preference, ({ one }) => ({
 }));
 
 export const callStatusEnum = pgEnum("status", [
-  "PENDING",
-  "INITIATED",
-  "RINGING",
-  "ANSWERED",
+  "PENDING", // The call is scheduled but not yet attempted.
+  "INITIATED", // The call process has started
+  "ANSWERED", // The call has been answered
   "COMPLETED", // Successfully played message
-  "NO_ANSWER",
-  "BUSY",
-  "FAILED", // Twilio error or other failure
-  "RETRY_SCHEDULED",
+  "NO_ANSWER", // No one picked up the call
+  "FAILED", // Calling error or other failure
+  "RETRY_SCHEDULED", // The call has failed and a retry is scheduled
 ]);
 
-export const callLog = createTable("call_log", (t) => ({
-  id: t.uuid("id").primaryKey().defaultRandom(),
-  userId: t
-    .text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  scheduledTimeUtc: t
-    .timestamp("scheduled_time_utc", { mode: "date", withTimezone: true })
-    .notNull(),
-  initiatedTimeUtc: t.timestamp("initiated_time_utc", {
-    mode: "date",
-    withTimezone: true,
+export const callLog = createTable(
+  "call_log",
+  (t) => ({
+    id: t.uuid("id").primaryKey().defaultRandom(),
+    jobId: t.text("job_id").notNull(), // Or parentJobId. This is for grouping
+    userId: t
+      .text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    scheduledTimeUtc: t
+      .timestamp("scheduled_time_utc", { mode: "date", withTimezone: true })
+      .notNull(),
+    initiatedTimeUtc: t.timestamp("initiated_time_utc", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    twilioCallSid: t.text("twilio_call_sid").unique(),
+    status: callStatusEnum().default("PENDING").notNull(),
+    attemptNumber: t.integer("attempt_number").default(1).notNull(),
+    durationSeconds: t.integer("duration_seconds"),
+    errorMessage: t.text("error_message"),
+    createdAt: t
+      .timestamp("created_at", { mode: "date", withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: t
+      .timestamp("updated_at", { mode: "date", withTimezone: true })
+      .$onUpdate(() => new Date()),
   }),
-  twilioCallSid: t.text("twilio_call_sid").unique(),
-  status: callStatusEnum().default("PENDING").notNull(),
-  attemptNumber: t.integer("attempt_number").default(1).notNull(),
-  retryScheduledTimeUtc: t.timestamp("retry_scheduled_time_utc", {
-    mode: "date",
-    withTimezone: true,
-  }),
-  durationSeconds: t.integer("duration_seconds"),
-  errorMessage: t.text("error_message"),
-  createdAt: t
-    .timestamp("created_at", { mode: "date", withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: t
-    .timestamp("updated_at", { mode: "date", withTimezone: true })
-    .$onUpdate(() => new Date()),
-}));
+  (t) => [
+    index("call_log_job_id_idx").on(t.jobId),
+    index("call_log_user_id_idx").on(t.userId),
+    index("call_log_status_idx").on(t.status),
+    index("call_log_scheduled_time_utc_idx").on(t.scheduledTimeUtc),
+  ]
+);
 
 export const callLogRelations = relations(callLog, ({ one }) => ({
   user: one(user, {

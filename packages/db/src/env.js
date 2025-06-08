@@ -5,10 +5,11 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
 // Get the directory of this file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// Renamed to avoid conflict with drizzle
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDir = dirname(currentFilePath);
 
-config({ path: join(__dirname, "../.env") });
+config({ path: join(currentDir, "../.env") });
 
 config({ path: join(process.cwd(), ".env") });
 

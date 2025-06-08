@@ -1,6 +1,7 @@
 {
   "name": "@fajr-ring/db",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "eslint . --ext .ts",
     "db:generate": "drizzle-kit generate",
@@ -11,15 +12,15 @@
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.6",
+    "dotenv": "^16.5.0",
     "drizzle-orm": "^0.41.0",
     "postgres": "^3.4.4",
-    "zod": "^3.25.28",
-    "dotenv": "^16.5.0"
+    "zod": "^3.25.28"
   },
   "devDependencies": {
     "@fajr-ring/tsconfig": "workspace:*",
     "@types/node": "^20.14.10",
-    "drizzle-kit": "^0.30.5",
+    "drizzle-kit": "^0.31.1",
     "eslint": "^9.23.0",
     "typescript": "^5.8.2"
   },
