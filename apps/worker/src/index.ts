@@ -5,7 +5,7 @@ import { db } from "@fajr-ring/db";
 import { buildTwilioStatusCallbackUrl, createCall } from "#call";
 import { callLog, callStatusEnum } from "@fajr-ring/db/schema";
 import { env } from "./env";
-import { getJobTimestamps } from "#lib/utils";
+import { getJobTimestamps, logJobToCallLog } from "#lib/utils";
 
 // TODO: Read the docs one more time and tweak.
 // TODO: Handle errors as you should
@@ -57,38 +57,25 @@ const worker = new Worker<CallJobData, CallJobReturn>(
 );
 
 worker.on("completed", (job, returnvalue) => {
-  // TODO: log the data to callLogs
+  console.log(`[WORKER JOB]: COMPLETED`);
 
-  console.log({ job, returnvalue });
-
-  // TODO: schedule the next call
-  console.log(`Job ${job.id} completed with:`, returnvalue);
+  // TODO: schedule the next call?
 });
-
-// worker.on("active", (job, prev) => {
-// });
-
-// // This event is triggered when a job has stalled and has been moved back to the wait list.
-// worker.on("stalled", (job, prev) => {
-// });
 
 // This event is triggered when a job has thrown an exception.
 // Note: job parameter could be received as undefined when an stalled job reaches the stalled limit and it is deleted by the removeOnFail option.
-worker.on("failed", (job, err, prev) => {
-  const maxAttempts = job?.opts.attempts ?? 3;
-  const currentAttempt = job?.attemptsMade ?? 1;
-  console.log("from FAILED", job, prev);
-  // TODO: log the data to callLogs
+worker.on("failed", async (job, err, prev) => {
+  // TODO: schedule the next call?
+  console.error(`[WORKER JOB]: FAILED`, err.message);
 
-  // TODO: schedule the next call
-  console.error(`Job ${job?.id} failed:`, err);
+  // TODO: job could be undefined?!
+  if (job) {
+    await logJobToCallLog(job, undefined, "FAILED");
+  }
 });
 
 // Worker error
-worker.on("error", (err) => {
-  console.log("from ERROR", err);
-  // TODO: log the data to callLogs
-
-  // TODO: schedule the next call
-  console.error("Worker error:", err);
+worker.on("error", async (err) => {
+  // TODO: How to log data?
+  // TODO: schedule the next call?
 });

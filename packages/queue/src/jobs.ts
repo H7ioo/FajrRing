@@ -1,6 +1,7 @@
 import { callQueue } from "./queue";
 import { CallJobData } from "./types";
 
+// TODO: Log the call to the callLogs table (status: PENDING)
 export async function scheduleCallJob({
   userId,
   delayMs,

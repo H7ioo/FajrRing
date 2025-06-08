@@ -174,7 +174,7 @@ export const preferenceRelations = relations(preference, ({ one }) => ({
 }));
 
 export const callStatusEnum = pgEnum("status", [
-  "PENDING", // The call is scheduled but not yet attempted. (handled by worker)
+  "PENDING", // The call is scheduled but not yet attempted. (handled by trpc or queue)
   "INITIATED", // The call process has started (handled by calling service)
   "ANSWERED", // The call has been answered (handled by calling service)
   "COMPLETED", // Successfully played message (handled by calling service)
