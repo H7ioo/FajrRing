@@ -199,7 +199,7 @@ export const callLog = createTable(
     scheduledTimeUtc: t
       .timestamp("scheduled_time_utc", { mode: "date", withTimezone: true })
       .notNull(),
-    callSid: t.text("call_sid").unique(),
+    callSid: t.text("call_sid"),
     status: callStatusEnum().default("PENDING").notNull(),
     attemptNumber: t.integer("attempt_number").default(1).notNull(),
     callDuration: t.integer("call_duration"),
