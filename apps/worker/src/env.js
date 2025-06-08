@@ -17,7 +17,11 @@ export const env = createEnv({
     TWILIO_ACCOUNT_SID: z.string(),
     TWILIO_AUTH_TOKEN: z.string(),
     TWILIO_PHONE_NUMBER: z.string(),
-    TWILIO_CALL_STATUS_WEBHOOK_URL: z.string().url(),
+    // Remove trailing slash
+    TWILIO_WEBHOOK_BASE_URL: z
+      .string()
+      .url()
+      .transform((url) => url.replace(/\/$/, "")),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -26,7 +30,7 @@ export const env = createEnv({
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
     TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER,
-    TWILIO_CALL_STATUS_WEBHOOK_URL: process.env.TWILIO_CALL_STATUS_WEBHOOK_URL,
+    TWILIO_WEBHOOK_BASE_URL: process.env.TWILIO_WEBHOOK_BASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
   emptyStringAsUndefined: true,

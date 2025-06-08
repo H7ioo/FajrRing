@@ -7,30 +7,26 @@ const Twilio = twilioPkg.Twilio;
 
 export const client = new Twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
 export const validateRequest = twilioPkg.validateRequest;
+export const VoiceResponse = twilioPkg.twiml.VoiceResponse;
 
 // TODO: Create a quiz game inside of the call. @see https://www.twilio.com/docs/voice/tutorials/how-to-gather-user-input-via-keypad/node
 
 export async function createCall({
   phoneNumber,
-  statusCallback,
+  statusCallbackUrl,
 }: {
   phoneNumber: string;
-  statusCallback: string;
+  statusCallbackUrl: string;
 }) {
   const call = await client.calls.create({
     from: env.TWILIO_PHONE_NUMBER,
     to: phoneNumber,
-    url: "http://demo.twilio.com/docs/voice.xml",
-    statusCallback,
+    // url: "http://demo.twilio.com/docs/voice.xml",
+    url: `${env.TWILIO_WEBHOOK_BASE_URL}/twilio/voice`,
+    method: "POST",
+    statusCallback: statusCallbackUrl,
     statusCallbackMethod: "POST",
-    statusCallbackEvent: [
-      "ringing",
-      "canceled",
-      "completed",
-      "busy",
-      "no-answer",
-      "failed",
-    ],
+    statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
   });
 
   return call;

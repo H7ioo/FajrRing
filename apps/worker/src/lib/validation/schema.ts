@@ -67,7 +67,7 @@ export const twilioStatusQuerySchema = z.object({
   userId: z.string().min(1),
   initiatedTimeUtc: z.string().datetime(),
   scheduledTimeUtc: z.string().datetime(),
-  attemptsMade: z.coerce.number().int().positive(),
+  attemptsMade: z.coerce.number().int().nonnegative(),
 });
 
 export type TwilioStatusBody = z.infer<typeof twilioStatusBodySchema>;

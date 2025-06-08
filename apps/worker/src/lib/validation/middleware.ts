@@ -1,5 +1,3 @@
-// src/middleware/twilioAuth.ts
-
 import { validateRequest } from "#call";
 import { createMiddleware } from "hono/factory";
 
@@ -16,7 +14,7 @@ type TwilioAuthOptions = {
   /**
    * A function that returns the public base URL of your webhook.
    * This is crucial for environments behind a proxy or ngrok.
-   * e.g., () => process.env.TWILIO_CALL_STATUS_WEBHOOK_URL
+   * e.g., () => process.env.TWILIO_WEBHOOK_BASE_URL
    */
   baseUrl: () => string;
 };
@@ -32,11 +30,10 @@ export const twilioAuth = (options: TwilioAuthOptions) => {
   return createMiddleware(async (c, next) => {
     const signature = c.req.header("x-twilio-signature");
     if (!signature) {
-      return c.status(403);
+      return c.text("FORBIDDEN", 403);
     }
 
-    // 1. Get the base URL from your environment, removing any trailing slash.
-    const baseUrl = options.baseUrl().replace(/\/$/, "");
+    const baseUrl = options.baseUrl();
 
     // 2. Get the path and query string from the incoming request.
     const path = c.req.path; // e.g., "/twilio/status"
@@ -51,7 +48,7 @@ export const twilioAuth = (options: TwilioAuthOptions) => {
     const isValid = validateRequest(token, signature, validationUrl, data);
 
     if (!isValid) {
-      c.status(401);
+      return c.text("UNAUTHORIZED", 401);
     }
 
     // Signature is valid, proceed to the next middleware or handler.

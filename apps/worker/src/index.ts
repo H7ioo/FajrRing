@@ -38,8 +38,8 @@ const worker = new Worker<CallJobData, CallJobReturn>(
 
     const { initiatedTimeUtc, scheduledTimeUtc } = getJobTimestamps(job);
 
-    const statusCallback = buildTwilioStatusCallbackUrl(
-      `${env.TWILIO_CALL_STATUS_WEBHOOK_URL}twilio/status`,
+    const statusCallbackUrl = buildTwilioStatusCallbackUrl(
+      `${env.TWILIO_WEBHOOK_BASE_URL}/twilio/status`,
       {
         userId: job.data.userId,
         jobId: job.id ?? "unknown", // It should always exist unless created manually
@@ -49,7 +49,7 @@ const worker = new Worker<CallJobData, CallJobReturn>(
       }
     );
 
-    const call = await createCall({ phoneNumber, statusCallback });
+    const call = await createCall({ phoneNumber, statusCallbackUrl });
 
     return { callSid: call.sid };
   },
