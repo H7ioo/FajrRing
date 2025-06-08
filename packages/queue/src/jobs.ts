@@ -1,38 +1,43 @@
-import { callQueue } from "#queue";
-import { CallJobData } from "#types.js";
+import { callQueue } from "./queue";
+import { CallJobData } from "./types";
 
-export async function scheduleCall({
+export async function scheduleCallJob({
   userId,
-  phoneNumber,
   delayMs,
 }: {
   userId: string;
-  phoneNumber: string;
   delayMs: number;
 }) {
   const data: CallJobData = {
     userId,
-    phoneNumber,
   };
 
   await callQueue.add("call-user", data, {
     jobId: userId,
     delay: delayMs,
+    // This way it will not be visualized in the bull-board but this way it is easier to see a job related to a user.
+    // I could save and log important data to the callLogs table
+    removeOnComplete: true,
+    removeOnFail: true,
   });
 }
 
-export async function callUser(userId: string) {
-  await callQueue.add("call-user", { userId });
+export async function enqueueCallUserJob(userId: string) {
+  await callQueue.add(
+    "call-user",
+    { userId },
+    { jobId: userId, removeOnComplete: true, removeOnFail: true }
+  );
 }
 
-export async function removeCallSchedule(userId: string) {
+export async function removeCallJob(userId: string) {
   await callQueue.remove(userId);
 }
 
-export async function getCallData(jobId: string) {
+export async function getCallJob(jobId: string) {
   return await callQueue.getJob(jobId);
 }
 
-export async function getCallsData() {
+export async function getCallJobs() {
   return await callQueue.getJobs();
 }

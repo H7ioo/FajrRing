@@ -2,7 +2,7 @@ import { getDelayUntilTime } from "@/lib/timezone";
 import { tryCatch } from "@/lib/utils";
 import { preferencesSchema } from "@/lib/validations/preference";
 import { preference } from "@fajr-ring/db/schema";
-import { removeCallSchedule, scheduleCall } from "@fajr-ring/queue/jobs";
+import { removeCallJob, scheduleCallJob } from "@fajr-ring/queue/jobs";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { TRPCErrorWithAction } from "../error";
@@ -108,9 +108,8 @@ export const preferenceRouter = createTRPCRouter({
         );
 
         const { error: queueError } = await tryCatch(
-          scheduleCall({
+          scheduleCallJob({
             userId: ctx.session.user.id,
-            phoneNumber: ctx.session.user.phoneNumber,
             delayMs: callDelay,
           }),
         );
@@ -130,9 +129,7 @@ export const preferenceRouter = createTRPCRouter({
           });
         }
       } else {
-        const { error } = await tryCatch(
-          removeCallSchedule(ctx.session.user.id),
-        );
+        const { error } = await tryCatch(removeCallJob(ctx.session.user.id));
         if (error) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",

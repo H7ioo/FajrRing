@@ -1,7 +1,7 @@
 import IORedis from "ioredis";
-import { env } from "#env";
+import { env } from "./env";
 
-const redisUrl = env.REDIS_DATABASE_URL || "redis://localhost:6379";
+const redisUrl = env.REDIS_DATABASE_URL;
 
 // Producer connection (default retry settings)
 export const producerConnection = new IORedis(redisUrl);

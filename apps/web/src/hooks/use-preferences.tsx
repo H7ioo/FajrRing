@@ -11,8 +11,6 @@ export function usePreferences() {
       });
     },
     onError(error, variables) {
-      const apiUtils = api.useUtils();
-
       if (!error.data?.metaError) {
         toast.error("Failed to save preferences. Please try again...", {});
         return;

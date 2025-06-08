@@ -1,4 +1,8 @@
 export type CallJobData = {
   userId: string;
-  phoneNumber: string;
+};
+
+export type CallJobReturn = {
+  callSid: string;
+  callDuration: string;
 };

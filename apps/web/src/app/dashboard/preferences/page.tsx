@@ -46,8 +46,6 @@ export default function PreferencesPage() {
   const { data: preferences, isLoading: isLoadingPreferences } =
     api.preference.get.useQuery();
 
-  console.log({ isLoadingPreferences, isSessionPending });
-
   const form = useForm<PreferencesFormData>({
     resolver: zodResolver(preferencesSchema),
     defaultValues: {

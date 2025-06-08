@@ -2,9 +2,6 @@
   "name": "@fajr-ring/queue",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "tsx src/queue.ts"
-  },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.6",
     "bullmq": "^5.53.2",
