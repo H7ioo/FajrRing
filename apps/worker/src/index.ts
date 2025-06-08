@@ -5,6 +5,7 @@ import { db } from "@fajr-ring/db";
 import { buildTwilioStatusCallbackUrl, createCall } from "#call";
 import { callLog, callStatusEnum } from "@fajr-ring/db/schema";
 import { env } from "./env";
+import { getJobTimestamps } from "#lib/utils";
 
 // TODO: Read the docs one more time and tweak.
 // TODO: Handle errors as you should
@@ -35,9 +36,7 @@ const worker = new Worker<CallJobData, CallJobReturn>(
       throw new Error("User is not active for calls");
     }
 
-    const scheduledTimeMs = job.timestamp + (job.opts.delay ?? 0);
-    const scheduledTimeUtc = new Date(scheduledTimeMs);
-    const initiatedTimeUtc = new Date(job.timestamp);
+    const { initiatedTimeUtc, scheduledTimeUtc } = getJobTimestamps(job);
 
     const statusCallback = buildTwilioStatusCallbackUrl(
       `${env.TWILIO_CALL_STATUS_WEBHOOK_URL}twilio/status`,
@@ -45,40 +44,17 @@ const worker = new Worker<CallJobData, CallJobReturn>(
         userId: job.data.userId,
         jobId: job.id ?? "unknown", // It should always exist unless created manually
         initiatedTimeUtc: initiatedTimeUtc.toISOString(),
-        scheduledTimeUtc: initiatedTimeUtc.toISOString(),
-        attemptNumber: job.attemptsMade,
+        scheduledTimeUtc: scheduledTimeUtc.toISOString(),
+        attemptsMade: job.attemptsMade,
       }
     );
 
-    await createCall({ phoneNumber, statusCallback });
+    const call = await createCall({ phoneNumber, statusCallback });
 
-    // TODO: Implement webhook for those
-    return { callSid: "", callDuration: "" };
+    return { callSid: call.sid };
   },
   { connection: workerConnection, concurrency: 10 }
 );
-
-async function logJobToCallLogs(
-  job: Job<CallJobData>,
-  returnvalue: CallJobReturn,
-  status: (typeof callStatusEnum)["enumValues"][number]
-) {
-  const scheduledTimeMs = job.timestamp + (job.opts.delay ?? 0);
-  const scheduledTimeUtc = new Date(scheduledTimeMs);
-  const initiatedTimeUtc = new Date(job.timestamp);
-
-  await db.insert(callLog).values({
-    userId: job.data.userId,
-    jobId: job.id ?? "unknown", // It should always exist unless created manually
-    status,
-    initiatedTimeUtc,
-    scheduledTimeUtc,
-    twilioCallSid: returnvalue.callSid,
-    durationSeconds: 0, // TODO: This is from the call
-    attemptNumber: job.attemptsMade,
-    errorMessage: job.failedReason,
-  });
-}
 
 worker.on("completed", (job, returnvalue) => {
   // TODO: log the data to callLogs

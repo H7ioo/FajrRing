@@ -14,15 +14,24 @@ export const twilioStatusBodySchema = z
 
     // --- Call Status & Direction (Always Present) ---
     CallStatus: z.enum([
+      // The call is in a queue, waiting to be initiated.
       "queued",
+      // The call has been removed from the queue and Twilio has started dialing.
       "initiated",
+      // The destination has started ringing.
       "ringing",
+      // The call was answered and is ongoing. Fired by the 'answered' event.
       "in-progress",
+      // The call has ended, for any reason.
       "completed",
+      // The called party was busy.
       "busy",
+      // The call could not be connected (e.g., invalid number, carrier error).
       "failed",
+      // The call was not answered before the timeout.
       "no-answer",
-      "canceled", // Also a possible status
+      // The call was canceled via the API before being answered.
+      "canceled",
     ]),
     Direction: z.enum(["inbound", "outbound-api", "outbound-dial"]),
 
@@ -58,7 +67,7 @@ export const twilioStatusQuerySchema = z.object({
   userId: z.string().min(1),
   initiatedTimeUtc: z.string().datetime(),
   scheduledTimeUtc: z.string().datetime(),
-  attemptNumber: z.coerce.number().int().positive(),
+  attemptsMade: z.coerce.number().int().positive(),
 });
 
 export type TwilioStatusBody = z.infer<typeof twilioStatusBodySchema>;

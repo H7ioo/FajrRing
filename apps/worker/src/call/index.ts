@@ -1,4 +1,4 @@
-import { TwilioStatusQuery } from "#validation/schema";
+import { TwilioStatusQuery } from "#lib/validation/schema";
 import { env } from "../env";
 
 // The package is in CommonJS so I have to do it this way
@@ -21,7 +21,7 @@ export async function createCall({
     from: env.TWILIO_PHONE_NUMBER,
     to: phoneNumber,
     url: "http://demo.twilio.com/docs/voice.xml",
-    statusCallback: statusCallback ?? env.TWILIO_CALL_STATUS_WEBHOOK_URL,
+    statusCallback,
     statusCallbackMethod: "POST",
     statusCallbackEvent: [
       "ringing",
@@ -45,6 +45,6 @@ export function buildTwilioStatusCallbackUrl(
   url.searchParams.set("userId", params.userId);
   url.searchParams.set("initiatedTimeUtc", params.initiatedTimeUtc);
   url.searchParams.set("scheduledTimeUtc", params.scheduledTimeUtc);
-  url.searchParams.set("attemptNumber", params.attemptNumber.toString());
+  url.searchParams.set("attemptsMade", params.attemptsMade.toString());
   return url.toString();
 }

@@ -1,11 +1,11 @@
 // I was between hono and fastify for the api but I'll go with hono for now
 
-import { client, validateRequest } from "#call";
-import { twilioAuth } from "#validation/middleware";
+import { logCallToCallLog } from "#lib/utils";
+import { twilioAuth } from "#lib/validation/middleware";
 import {
   twilioStatusBodySchema,
   twilioStatusQuerySchema,
-} from "#validation/schema";
+} from "#lib/validation/schema";
 import { env } from "../env";
 import { serve } from "@hono/node-server";
 import { zValidator } from "@hono/zod-validator";
@@ -36,7 +36,40 @@ app.post(
     const query = c.req.valid("query");
     const body = c.req.valid("form");
 
-    // TODO: callLogs logic
+    const logObject: Parameters<typeof logCallToCallLog>[0] = {
+      job: {
+        userId: query.userId,
+        jobId: query.jobId,
+        initiatedTimeUtc: query.initiatedTimeUtc,
+        scheduledTimeUtc: query.scheduledTimeUtc,
+        attemptsMade: query.attemptsMade,
+      },
+      twilio: body,
+    };
+
+    console.log(`[TWILIO EVENT]: ${body.CallStatus} TO ${body.TO}`);
+
+    switch (body.CallStatus) {
+      case "busy":
+      case "no-answer":
+        await logCallToCallLog(logObject, "NO_ANSWER");
+        break;
+      case "failed":
+        await logCallToCallLog(logObject, "FAILED");
+        break;
+      case "completed":
+        await logCallToCallLog(logObject, "COMPLETED");
+        break;
+      case "in-progress":
+        await logCallToCallLog(logObject, "ANSWERED");
+        break;
+      case "initiated":
+        await logCallToCallLog(logObject, "INITIATED");
+        break;
+      default:
+        await logCallToCallLog(logObject, "FAILED");
+        break;
+    }
 
     return c.text("OK");
   }

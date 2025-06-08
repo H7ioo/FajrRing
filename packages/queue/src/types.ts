@@ -4,5 +4,4 @@ export type CallJobData = {
 
 export type CallJobReturn = {
   callSid: string;
-  callDuration: string;
 };

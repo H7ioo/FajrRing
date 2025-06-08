@@ -174,13 +174,13 @@ export const preferenceRelations = relations(preference, ({ one }) => ({
 }));
 
 export const callStatusEnum = pgEnum("status", [
-  "PENDING", // The call is scheduled but not yet attempted.
-  "INITIATED", // The call process has started
-  "ANSWERED", // The call has been answered
-  "COMPLETED", // Successfully played message
-  "NO_ANSWER", // No one picked up the call
-  "FAILED", // Calling error or other failure
-  "RETRY_SCHEDULED", // The call has failed and a retry is scheduled
+  "PENDING", // The call is scheduled but not yet attempted. (handled by worker)
+  "INITIATED", // The call process has started (handled by calling service)
+  "ANSWERED", // The call has been answered (handled by calling service)
+  "COMPLETED", // Successfully played message (handled by calling service)
+  "NO_ANSWER", // No one picked up the call (handled by calling service)
+  "FAILED", // Calling error or other failure (handled by any)
+  "RETRY_SCHEDULED", // The call has failed and a retry is scheduled (handled by worker)
 ]);
 
 export const callLog = createTable(
@@ -192,17 +192,17 @@ export const callLog = createTable(
       .text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    scheduledTimeUtc: t
-      .timestamp("scheduled_time_utc", { mode: "date", withTimezone: true })
-      .notNull(),
     initiatedTimeUtc: t.timestamp("initiated_time_utc", {
       mode: "date",
       withTimezone: true,
     }),
-    twilioCallSid: t.text("twilio_call_sid").unique(),
+    scheduledTimeUtc: t
+      .timestamp("scheduled_time_utc", { mode: "date", withTimezone: true })
+      .notNull(),
+    callSid: t.text("call_sid").unique(),
     status: callStatusEnum().default("PENDING").notNull(),
     attemptNumber: t.integer("attempt_number").default(1).notNull(),
-    durationSeconds: t.integer("duration_seconds"),
+    callDuration: t.integer("call_duration"),
     errorMessage: t.text("error_message"),
     createdAt: t
       .timestamp("created_at", { mode: "date", withTimezone: true })
